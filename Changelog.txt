@@ -1,0 +1,26 @@
+Changelog:
+v4.2:
+- fxed two more erors:
+	- changed style of showing experience and levels from XXX(X) to XXXXX:XX,
+	- fixed name truncating,
+	- fixed alignment.
+
+v4.1:
+- fixed text error.
+
+v4:
+- reworked text file (now compatible with MO from @Infixo),
+- further UI tweaks.
+
+v3:
+- renamed some folders and files,
+- modified tooltips,
+- further UI adjustements.
+
+v2:
+- modified Resource list,
+- further adjustments to other files,
+- cleaning mod files.
+
+v1:
+- release: modified Unit, GP and City lists (only UI changes).
