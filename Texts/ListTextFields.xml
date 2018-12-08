@@ -63,11 +63,15 @@
 			<Text>Sleeping</Text>
 		</Row>
 		
-		<Row Tag="TXT_KEY_LI_UNIT_STATUS_IMPROVING" >
-			<Text>Improving</Text>
-		</Row>
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_EMBARKED" >
 			<Text>Embarked</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_LI_UNIT_STATUS_WORKER_AUTOMATED" >
+			<Text>Automated</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LI_UNIT_STATUS_WORKER_IDLE" >
+			<Text>Idle</Text>
 		</Row>
 		
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_TRADING">

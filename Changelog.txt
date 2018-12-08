@@ -1,4 +1,11 @@
 Changelog:
+v5:
+- unit name instead of unit type,
+- worker status now shows improvement and turns left instead of static word,
+- xp value coloured if unit reached 75% or 100% xp needed to next level,
+- alignement issues fixed,
+- code cleaning.
+
 v4.2:
 - fxed two more erors:
 	- changed style of showing experience and levels from XXX(X) to XXXXX:XX,

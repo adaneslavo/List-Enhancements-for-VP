@@ -7,8 +7,8 @@
     <Guid>200c965c-b3c0-43e6-8656-a7df71189c81</Guid>
     <ModVersion>5</ModVersion>
     <Stability>Stable</Stability>
-    <Teaser>Modifies EUI lists from left panel</Teaser>
-    <Description>Modifies EUI lists from left panel.</Description>
+    <Teaser>Ehancements for left EUI info panels</Teaser>
+    <Description>Modifies EUI lists in left info panels.</Description>
     <Authors>William Howard/adan_eslavo</Authors>
     <SpecialThanks>EUI makers</SpecialThanks>
     <AffectsSavedGames>true</AffectsSavedGames>
