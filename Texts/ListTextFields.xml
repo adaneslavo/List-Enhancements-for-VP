@@ -16,11 +16,11 @@
 		<Row Tag="TXT_KEY_LI_STATUS" >
 			<Text>Status</Text>
 		</Row>
-		
+
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_UPGRADE_TT" >
 			<Text>Upgrade to {1_Unit} for [ICON_GOLD]{2_Cost}</Text>
 		</Row>
-		
+
 		<Row Tag="TXT_KEY_LI_SORT_NAME" >
 			<Text>Sort by name</Text>
 		</Row>
@@ -57,12 +57,12 @@
 		<Row Tag="TXT_KEY_LI_SORT_PROGRESS" >
 			<Text>Sort by turns left to create new Great Person</Text>
 		</Row>
-		
-		
+
+
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_SLEEPING" >
 			<Text>Sleeping</Text>
 		</Row>
-		
+
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_EMBARKED" >
 			<Text>Embarked</Text>
 		</Row>
@@ -71,14 +71,14 @@
 			<Text>Automated</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_WORKER_IDLE" >
-			<Text>Idle</Text>
+			<Text></Text>
 		</Row>
-		
+
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_TRADING">
 			<Text>Trading</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_TRADING_TT">
-			<Text>Between {1_FromCity} and {2_ToCity}{3_Recall}</Text>
+			<Text>From {1_FromCity} to {2_ToCity}{3_Recall}</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_RECALLING_TT">
 			<Text>[COLOR_WARNING_TEXT] (Recalling)[ENDCOLOR]</Text>
@@ -99,10 +99,19 @@
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_GARRISONED" >
 			<Text>Garrisoned</Text>
 		</Row>
+			<Row Tag="TXT_KEY_LI_UNIT_STATUS_GARRISONED_HEALING" >
+				<Text>Garrisoned/Healing</Text>
+			</Row>
+			<Row Tag="TXT_KEY_LI_UNIT_STATUS_GARRISONED_ALERT" >
+				<Text>Garrisoned/Alerting</Text>
+			</Row>
+			<Row Tag="TXT_KEY_LI_UNIT_STATUS_GARRISONED_FORTIFIED" >
+				<Text>Garrisoned/Fortified</Text>
+			</Row>
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_HEALING" >
 			<Text>Healing</Text>
 		</Row>
-		
+
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_BUILD_SKIP_WORDS" >
 			<Text>Construct Chop Down Remove Clear Scrub a an</Text>
 		</Row>
