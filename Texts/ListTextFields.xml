@@ -75,7 +75,7 @@
 		</Row>
 
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_TRADING">
-			<Text>Trading</Text>
+			<Text>Trading ({1_TurnLeft})</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_TRADING_TT">
 			<Text>From {1_FromCity} to {2_ToCity}{3_Recall}</Text>
@@ -96,18 +96,15 @@
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_FORTIFIED" >
 			<Text>Fortified</Text>
 		</Row>
-		<Row Tag="TXT_KEY_LI_UNIT_STATUS_GARRISONED" >
-			<Text>Garrisoned</Text>
+		<Row Tag="TXT_KEY_LI_UNIT_STATUS_IN_CITY" >
+			<Text>City</Text>
 		</Row>
-			<Row Tag="TXT_KEY_LI_UNIT_STATUS_GARRISONED_HEALING" >
-				<Text>Garrisoned/Healing</Text>
-			</Row>
-			<Row Tag="TXT_KEY_LI_UNIT_STATUS_GARRISONED_ALERT" >
-				<Text>Garrisoned/Alerting</Text>
-			</Row>
-			<Row Tag="TXT_KEY_LI_UNIT_STATUS_GARRISONED_FORTIFIED" >
-				<Text>Garrisoned/Fortified</Text>
-			</Row>
+		<Row Tag="TXT_KEY_LI_UNIT_STATUS_IN_FORT" >
+			<Text>Fort</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LI_UNIT_STATUS_IN_CITADEL" >
+			<Text>Citadel</Text>
+		</Row>
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_HEALING" >
 			<Text>Healing</Text>
 		</Row>

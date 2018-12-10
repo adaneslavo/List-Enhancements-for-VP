@@ -1,8 +1,12 @@
 Changelog:
 v5:
-- unit name instead of unit type,
+- unit name instead of unit type:
+	- added tooltip ==> shows CS and RCS/Range statistics for military units,
+					==> shows spreads left for religious units.
 - worker status now shows improvement and turns left instead of static word,
-- xp value coloured if unit reached 75% or 100% xp needed to next level,
+- if unit is garrisoned tooltip shows in which city, fort or citadel,
+- xp value coloured if unit reached 75% or 100% xp needed to next level:
+	- modified tooltip ==> now shows current unit promotions instaed of repeating the info.
 - alignement issues fixed,
 - code cleaning.
 

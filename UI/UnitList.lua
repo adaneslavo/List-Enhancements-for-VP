@@ -58,7 +58,7 @@ ContextPtr:SetInputHandler(InputHandler)
 
 -- on opening functions
 function OnOpenInfoCorner(iInfoType)
-    if(iInfoType == InfoCornerID.Units) then
+    if iInfoType == InfoCornerID.Units then
         ContextPtr:SetHide(false)
         OnSort(m_SortMode)
     else
@@ -102,7 +102,6 @@ function UpdateDisplay()
     
     local bFoundMilitary = false
     local bFoundCivilian = false
-    
     local pSelectedUnit = UI:GetHeadSelectedUnit()
     local iSelectedUnit = -1
     
@@ -118,14 +117,18 @@ function UpdateDisplay()
         local iUnit = unit:GetID()
         local iUnitType = Locale.Lookup(unit:GetNameKey())
 		local iUnitName = Locale.ConvertTextKey(unit:GetName())
-		
+		local bIsMilitary = false
+		local bIsCivilian = false
+    
         -- category
 		if unit:IsCombatUnit() or unit:GetDomainType() == DomainTypes.DOMAIN_AIR then
             instance = m_MilitaryIM:GetInstance()
             bFoundMilitary = true
+			bIsMilitary = true
         else
             instance = m_CivilianIM:GetInstance()
             bFoundCivilian = true
+			bIsCivilian = true
         end
         
         local sortEntry = {}
@@ -152,41 +155,76 @@ function UpdateDisplay()
         instance.SelectionFrame:SetHide(not (iSelectedUnit == iUnit))
         
 		-- name tooltip
-		local sCS = tostring(unit:GetBaseCombatStrength())
-		local sStatistics = sCS .. " [ICON_STRENGTH]"
-		local iRCS = unit:GetBaseRangedCombatStrength()
 		
-		if iRCS > 0 then
-			local sRCS = tostring(iRCS)
-			local sRange = tostring(unit:Range())
-			sStatistics = sStatistics .. "[NEWLINE]" .. sRCS .. "/" .. sRange .. " [ICON_RANGE_STRENGTH]"
-		end
+		if bIsMilitary then
+			local sCS = tostring(unit:GetBaseCombatStrength())
+			local sStatistics = sCS .. " [ICON_STRENGTH]"
+			local iRCS = unit:GetBaseRangedCombatStrength()
+		
+			if iRCS > 0 then
+				local sRCS = tostring(iRCS)
+				local sRange = tostring(unit:Range())
+				sStatistics = sStatistics .. "[NEWLINE]" .. sRCS .. "/" .. sRange .. " [ICON_RANGE_STRENGTH]"
+			end
 				
-		instance.UnitName:SetToolTipString(sStatistics)
-		
+			instance.UnitName:SetToolTipString(sStatistics)
+		elseif bIsCivilian then
+			local condition = "ID = '" .. unit:GetUnitType() .. "'"
+			
+			for civilian in GameInfo.Units(condition) do
+				if civilian.SpreadReligion and unit:GetSpreadsLeft() > 0 then
+					instance.UnitName:SetToolTipString(tostring(unit:GetSpreadsLeft()) .. GameInfo.Religions[unit:GetReligion()].IconString)
+				end
+			end		
+		end
+
 		-- status field
-        local iBuildType = unit:GetBuildType()
+        local sStatus = ""
+		local iBuildType = unit:GetBuildType()
         local iActivityType = unit:GetActivityType()
+		local isInCitadel = unit:GetPlot():GetImprovementType() == GameInfoTypes.IMPROVEMENT_CITADEL
+		local isInFort = unit:GetPlot():GetImprovementType() == GameInfoTypes.IMPROVEMENT_FORT
 		
 		instance.Status:SetToolTipString(nil)
         
 		if unit:IsEmbarked() then
             sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_EMBARKED"
             instance.Status:SetHide(false)
-       elseif unit:IsGarrisoned() then
-			if iActivityType == ActivityTypes.ACTIVITY_HEAL then
-				sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_GARRISONED_HEALING"
-				instance.Status:SetHide(false)
-			elseif iActivityType == ActivityTypes.ACTIVITY_SENTRY then
-				sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_GARRISONED_ALERT"
-				instance.Status:SetHide(false)
-			elseif unit:GetFortifyTurns() > 0 then
-				sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_GARRISONED_FORTIFIED"
-				instance.Status:SetHide(false)
+       elseif unit:IsGarrisoned() or isInFort or isInCitadel then
+			if unit:IsGarrisoned() then
+				sStatus = Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_IN_CITY")
+			elseif isInFort then
+				sStatus = Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_IN_FORT")
 			else
-				sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_GARRISONED"
-				instance.Status:SetHide(false)
+				sStatus = Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_IN_CITADEL")
 			end
+						
+			instance.Status:SetHide(false)
+
+			if iActivityType == ActivityTypes.ACTIVITY_HEAL then
+				sStatus = Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_HEALING") .. " in " .. sStatus
+			elseif iActivityType == ActivityTypes.ACTIVITY_SENTRY then
+				sStatus = Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_ALERT") .. " from " .. sStatus
+			elseif unit:GetFortifyTurns() > 0 then
+				sStatus = Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_FORTIFIED") .. " in " .. sStatus
+			else
+				sStatus = "In " .. sStatus
+			end
+			
+			sortEntry.status = sStatus
+			
+			local sPlace = ""
+			local sCity = unit:GetPlot():GetWorkingCity():GetName()
+			
+			if unit:IsGarrisoned() then
+				sPlace = "Garrisoned in " .. sCity
+			elseif isInFort then
+				sPlace = "Garrisoned in Fort near " .. sCity
+			else
+				sPlace = "Garrisoned in Citadel near " .. sCity
+			end
+			
+			instance.Status:SetToolTipString(sPlace)
         elseif iActivityType == ActivityTypes.ACTIVITY_HEAL then
 			sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_HEALING"
 			instance.Status:SetHide(false)
@@ -230,10 +268,6 @@ function UpdateDisplay()
 			instance.Status:SetHide(false)
 		elseif unit:IsAutomated() then
 			if unit.IsTrade ~= nil and unit:IsTrade() then
-				sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_TRADING"
-				instance.Status:SetHide(false)
-
-				-- Extra stuff if the Trade Route API is available from the DLL mod
 				if Game.GetTradeRoute then
 					local iRoute = unit:GetTradeRouteIndex()
 					
@@ -251,6 +285,8 @@ function UpdateDisplay()
 								end
 							end
 							
+							sortEntry.status = Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_TRADING", route.TurnsLeft)
+							instance.Status:SetHide(false)
 							instance.Status:SetToolTipString(Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_TRADING_TT", route.FromCityName, route.ToCityName, sRecall))
 						end
 					end
@@ -374,8 +410,6 @@ function UpdateDisplay()
 			
 			for promotion in GameInfo.UnitPromotions() do
 				if unit:IsHasPromotion(promotion.ID) then
-					--sIcon = IconHookup(promotion.PortraitIndex, 32, promotion.IconAtlas)
-					
 					if sPromotions == "" then
 						sPromotions = Locale.ConvertTextKey(promotion.Description)
 					else
