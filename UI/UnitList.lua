@@ -155,7 +155,6 @@ function UpdateDisplay()
         instance.SelectionFrame:SetHide(not (iSelectedUnit == iUnit))
         
 		-- name tooltip
-		
 		if bIsMilitary then
 			local sCS = tostring(unit:GetBaseCombatStrength())
 			local sStatistics = sCS .. " [ICON_STRENGTH]"
@@ -548,7 +547,6 @@ function OnSort(type)
 	Controls.MilitaryStack:SortChildren(SortFunction)
     Controls.CivilianStack:SortChildren(SortFunction)
 end
-
 Controls.SortName:RegisterCallback(Mouse.eLClick, OnSort)
 Controls.SortStatus:RegisterCallback(Mouse.eLClick, OnSort)
 Controls.SortDamage:RegisterCallback(Mouse.eLClick, OnSort)

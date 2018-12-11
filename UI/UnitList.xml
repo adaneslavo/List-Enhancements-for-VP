@@ -8,7 +8,7 @@
 				<Grid Anchor="C,C" Offset="40,0" Size="485,24" Style="Grid9FrameTurns" ID="SelectionFrame" />
 
 				<Box Anchor="L,C" Color="255.255.255.0" Offset="0,0" Size="220,24">
-					<Label Anchor="C,C" ID="UnitName" Offset="1,0" String="" WrapWidth="220" ColorSet="Beige_Black_Alpha" Font="TwCenMT18" FontStyle="Shadow" />
+					<Label Anchor="C,C" ID="UnitName" Offset="1,0" String="" WrapWidth="220" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" />
 				</Box>
 
 				<ShowOnMouseOver>
@@ -28,20 +28,20 @@
 				<Box Anchor="L,C" Color="255.255.255.0" Offset="0,0" Size="150,24" />
 
 				<Box ID="StatusBox" Anchor="L,C" Color="255.255.255.0" Offset="45,0" Size="130,24">
-					<Label Anchor="C,C" WrapWidth="150" LeadingOffset="0" Offset="0,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT18" FontStyle="Shadow" Hidden="1" ID="Status" />
+					<Label Anchor="C,C" WrapWidth="150" LeadingOffset="0" Offset="0,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" Hidden="1" ID="Status" />
 				</Box>
 
 				<Box ID="DamageBox" Anchor="L,C" Color="255.255.255.0" Offset="0,0" Size="60,24">
-					<Label Anchor="R,C" WrapWidth="45" Offset="15,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT18" FontStyle="Shadow" Hidden="1" ID="Damage" />
+					<Label Anchor="R,C" WrapWidth="45" Offset="15,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" Hidden="1" ID="Damage" />
 				</Box>
 
 				<Box ID="ExperienceBox" Anchor="L,C" Color="255.255.255.0" Offset="15,0" Size="60,24">
-					<Label Anchor="R,C" WrapWidth="70" Offset="15,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT18" FontStyle="Shadow" Hidden="1" ID="Experience" />
+					<Label Anchor="R,C" WrapWidth="70" Offset="15,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" Hidden="1" ID="Experience" />
 				</Box>
 
 				<Box ID="UpgradeBox" Anchor="L,C" Color="255.255.255.0" Offset="-10,0" Size="30,24">
 					<Button Size="30,24" Anchor="C,C" ID="UpgradeButton" >
-						<Label Anchor="C,C" Offset="0,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT18" FontStyle="Shadow" Hidden="1" ID="Upgrade" String="[ICON_GOLD]"/>
+						<Label Anchor="C,C" Offset="0,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" Hidden="1" ID="Upgrade" String="[ICON_GOLD]"/>
 					</Button>
 				</Box>
 

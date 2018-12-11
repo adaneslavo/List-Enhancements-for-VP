@@ -8,7 +8,7 @@
 			<Text>Name</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_XP" >
-			<Text>XP(Lvl)</Text>
+			<Text>XP:Lvl</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_HP" >
 			<Text>HP</Text>
@@ -39,18 +39,26 @@
 		<Row Tag="TXT_KEY_LI_SORT_MOVES" >
 			<Text>Sort by moves left</Text>
 		</Row>
+		
+		<Row Tag="TXT_KEY_LI_SORT_CITY_NAME" >
+			<Text>Sort by name (right click to center on city)</Text>
+		</Row>
 		<Row Tag="TXT_KEY_LI_SORT_PRODUCTION" >
 			<Text>Sort by turns left to finish current production</Text>
 		</Row>
-		<Row Tag="TXT_KEY_LI_SORT_UNHAPPINESS" >
+		<Row Tag="TXT_KEY_LI_SORT_HAPPINESS" >
 			<Text>Sort by unhappiness value</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_SORT_POPULATION" >
 			<Text>Sort by current population</Text>
 		</Row>
-		<Row Tag="TXT_KEY_LI_SORT_STRENGTH" >
-			<Text>Sort by current population</Text>
+		<Row Tag="TXT_KEY_LI_SORT_BORDER_GROWTH" >
+			<Text>Sort by next border growth time</Text>
 		</Row>
+		<Row Tag="TXT_KEY_LI_SORT_DEFENSE" >
+			<Text>Sort by defense value (possible range attack)</Text>
+		</Row>
+		
 		<Row Tag="TXT_KEY_LI_SORT_RESOURCE" >
 			<Text>Sort by total number of luxury resources</Text>
 		</Row>
@@ -90,6 +98,7 @@
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_EXPLORING" >
 			<Text>Exploring</Text>
 		</Row>
+		
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_ALERT" >
 			<Text>Alerting</Text>
 		</Row>

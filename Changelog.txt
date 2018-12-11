@@ -1,13 +1,25 @@
 Changelog:
 v5:
-- unit name instead of unit type:
-	- added tooltip ==> shows CS and RCS/Range statistics for military units,
-					==> shows spreads left for religious units.
-- worker status now shows improvement and turns left instead of static word,
-- if unit is garrisoned tooltip shows in which city, fort or citadel,
-- xp value coloured if unit reached 75% or 100% xp needed to next level:
-	- modified tooltip ==> now shows current unit promotions instaed of repeating the info.
+- unit list:
+	- set unit name instead of unit type,
+	- added tooltip to unit name ==> shows CS and RCS/Range statistics for military units,
+								 ==> shows spreads left for religious units.
+	- worker status now shows improvement and turns left instead of static word,
+	- caravan status now shows turn left to finish the trade route,
+	- if unit is garrisoned status shows what is its current state,
+	- if unit is garrisoned status tooltip shows in which city, or if in fort or citadel - near which city,
+	- xp value coloured if unit reached 75% (yellow) or 100% (green) xp needed to next level,
+	- xp tooltip now shows current unit promotions instead of repeating the info.
+- city list:
+	- fixed sorting
+	- added defense value and merged it with icon showing if city attack is possible,
+	- clicking on icon for city attack zooms to city,
+	- reworked city name and health bar; now longer names, healthbar moved and aligned to the left,
+	- rearranged columns,
+	- added culture bar,
+	- readded population growth tooltip.
 - alignement issues fixed,
+- lowered main font,
 - code cleaning.
 
 v4.2:
