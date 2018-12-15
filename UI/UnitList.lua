@@ -19,16 +19,18 @@ local m_MilitaryIM = InstanceManager:new("UnitInstance", "Root", Controls.Milita
 local m_CivilianIM = InstanceManager:new("UnitInstance", "Root", Controls.CivilianStack)
 
 local eName       = 0
-local eStatus     = 1
-local eExperience = 2
-local eDamage     = 3
+local eDamage     = 1
+local eStatus     = 2
+local eExperience = 3
 local eUpgrade    = 4
 local eMovement   = 5
 
-local m_SortTable
-local m_SortMode = eName
+local m_tSortTable
+local m_iSortMode = eName
 local m_bSortReverse = false
 
+local m_tExperience = {}
+local m_bDeadUnit = false
 
 -- open window
 function ShowHideHandler(bIsHide)
@@ -60,7 +62,7 @@ ContextPtr:SetInputHandler(InputHandler)
 function OnOpenInfoCorner(iInfoType)
     if iInfoType == InfoCornerID.Units then
         ContextPtr:SetHide(false)
-        OnSort(m_SortMode)
+        OnSort(m_iSortMode)
     else
         ContextPtr:SetHide(true)
     end
@@ -92,13 +94,15 @@ Events.SerialEventUnitMoveToHexes.Add(OnChangeEvent)
 Events.SerialEventUnitMove.Add(OnChangeEvent)
 Events.SerialEventUnitTeleportedToHex.Add(OnChangeEvent)
 Events.GameplaySetActivePlayer.Add(OnChangeEvent)
-
+GameEvents.UnitPromoted.Add(OnChangeEvent)
 
 -- main function
 function UpdateDisplay()
-    m_SortTable = {}
-
-    local pPlayer = Players[Game.GetActivePlayer()]
+	print("nowy update")
+	print(" ")
+	m_tSortTable = {}
+	
+	local pPlayer = Players[Game.GetActivePlayer()]
     
     local bFoundMilitary = false
     local bFoundCivilian = false
@@ -112,6 +116,30 @@ function UpdateDisplay()
     m_MilitaryIM:ResetInstances()
     m_CivilianIM:ResetInstances()
    
+	-- check for dead units
+	local bCheckedAndDeadPermanent = false
+	
+	for id, xp in pairs(m_tExperience) do
+		local bCheckedAndDead = true
+		print(id)
+		for unit in pPlayer:Units() do
+			iUnit = unit:GetID()
+			
+			if iUnit == id then
+				bCheckedAndDead = false
+				print("found")
+				break
+			end
+		end
+	
+		if bCheckedAndDead == true then
+			m_tExperience[id] = nil
+			bCheckedAndDeadPermanent = true
+			print("usunieto")
+		end
+	end
+	
+	-- main loop
     for unit in pPlayer:Units() do
         local instance
         local iUnit = unit:GetID()
@@ -119,7 +147,8 @@ function UpdateDisplay()
 		local iUnitName = Locale.ConvertTextKey(unit:GetName())
 		local bIsMilitary = false
 		local bIsCivilian = false
-    
+		local sStatistics
+		
         -- category
 		if unit:IsCombatUnit() or unit:GetDomainType() == DomainTypes.DOMAIN_AIR then
             instance = m_MilitaryIM:GetInstance()
@@ -132,7 +161,7 @@ function UpdateDisplay()
         end
         
         local sortEntry = {}
-        m_SortTable[tostring(instance.Root)] = sortEntry
+        m_tSortTable[tostring(instance.Root)] = sortEntry
         
         -- click callback
 		instance.Button:RegisterCallback(Mouse.eLClick, OnUnitClicked)
@@ -143,8 +172,8 @@ function UpdateDisplay()
 			iUnitName = string.sub(iUnitName, 1, #iUnitName - #iUnitType - 3)
 		end
 		
-		sortEntry.name = iUnitName
-        TruncateString(instance.UnitName, 220, sortEntry.name)
+		sortEntry.Name = iUnitName
+        TruncateString(instance.UnitName, 140, sortEntry.Name)
 		
         if unit:MovesLeft() > 0 then
             instance.Button:SetAlpha(1.0)
@@ -157,7 +186,7 @@ function UpdateDisplay()
 		-- name tooltip
 		if bIsMilitary then
 			local sCS = tostring(unit:GetBaseCombatStrength())
-			local sStatistics = sCS .. " [ICON_STRENGTH]"
+			sStatistics = sCS .. " [ICON_STRENGTH]"
 			local iRCS = unit:GetBaseRangedCombatStrength()
 		
 			if iRCS > 0 then
@@ -165,8 +194,6 @@ function UpdateDisplay()
 				local sRange = tostring(unit:Range())
 				sStatistics = sStatistics .. "[NEWLINE]" .. sRCS .. "/" .. sRange .. " [ICON_RANGE_STRENGTH]"
 			end
-				
-			instance.UnitName:SetToolTipString(sStatistics)
 		elseif bIsCivilian then
 			local condition = "ID = '" .. unit:GetUnitType() .. "'"
 			
@@ -187,7 +214,7 @@ function UpdateDisplay()
 		instance.Status:SetToolTipString(nil)
         
 		if unit:IsEmbarked() then
-            sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_EMBARKED"
+            sortEntry.Status = "TXT_KEY_LI_UNIT_STATUS_EMBARKED"
             instance.Status:SetHide(false)
        elseif unit:IsGarrisoned() or isInFort or isInCitadel then
 			if unit:IsGarrisoned() then
@@ -210,7 +237,7 @@ function UpdateDisplay()
 				sStatus = "In " .. sStatus
 			end
 			
-			sortEntry.status = sStatus
+			sortEntry.Status = sStatus
 			
 			local sPlace = ""
 			local sCity = unit:GetPlot():GetWorkingCity():GetName()
@@ -225,16 +252,16 @@ function UpdateDisplay()
 			
 			instance.Status:SetToolTipString(sPlace)
         elseif iActivityType == ActivityTypes.ACTIVITY_HEAL then
-			sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_HEALING"
+			sortEntry.Status = "TXT_KEY_LI_UNIT_STATUS_HEALING"
 			instance.Status:SetHide(false)
 		elseif iActivityType == ActivityTypes.ACTIVITY_SENTRY then
-			sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_ALERT"
+			sortEntry.Status = "TXT_KEY_LI_UNIT_STATUS_ALERT"
 			instance.Status:SetHide(false)
         elseif unit:GetFortifyTurns() > 0 then
-            sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_FORTIFIED"
+            sortEntry.Status = "TXT_KEY_LI_UNIT_STATUS_FORTIFIED"
             instance.Status:SetHide(false)
         elseif iActivityType == ActivityTypes.ACTIVITY_SLEEP then
-			sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_SLEEPING"
+			sortEntry.Status = "TXT_KEY_LI_UNIT_STATUS_SLEEPING"
 			instance.Status:SetHide(false)
 		elseif iBuildType ~= -1 then -- this is a worker who is actively building something
     		local sThisBuild = GameInfo.Builds[iBuildType]
@@ -260,10 +287,10 @@ function UpdateDisplay()
     			sCivilianUnitStr = sCivilianUnitStr.." ("..tostring(iTurnsLeft)..") "
     		end
             
-			sortEntry.status = sCivilianUnitStr
+			sortEntry.Status = sCivilianUnitStr
             instance.Status:SetHide(false)   
     	elseif unit:IsWork() and unit:IsAutomated() then
-			sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_WORKER_AUTOMATED"
+			sortEntry.Status = "TXT_KEY_LI_UNIT_STATUS_WORKER_AUTOMATED"
 			instance.Status:SetHide(false)
 		elseif unit:IsAutomated() then
 			if unit.IsTrade ~= nil and unit:IsTrade() then
@@ -284,23 +311,23 @@ function UpdateDisplay()
 								end
 							end
 							
-							sortEntry.status = Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_TRADING", route.TurnsLeft)
+							sortEntry.Status = Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_TRADING", route.TurnsLeft)
 							instance.Status:SetHide(false)
 							instance.Status:SetToolTipString(Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_TRADING_TT", route.FromCityName, route.ToCityName, sRecall))
 						end
 					end
 				end
 			else
-				sortEntry.status = "TXT_KEY_LI_UNIT_STATUS_EXPLORING"
+				sortEntry.Status = "TXT_KEY_LI_UNIT_STATUS_EXPLORING"
 				instance.Status:SetHide(false)
 			end
 		else
-            sortEntry.status = ""
+            sortEntry.Status = ""
             instance.Status:SetHide(true)
         end
                 
-        if sortEntry.status ~= "" then
-		    instance.Status:LocalizeAndSetText(sortEntry.status)
+        if sortEntry.Status ~= "" then
+		    instance.Status:LocalizeAndSetText(sortEntry.Status)
 	    else
 		    instance.Status:SetText("")
 	    end
@@ -308,7 +335,7 @@ function UpdateDisplay()
 	    local statusY = instance.Status:GetSizeY()
 	    statusY = statusY + 10
 	    
-		if statusY > 24 then
+		if statusY > 28 then
 		   instance.ExperienceBox:SetSizeY(statusY) 
 		   instance.StatusBox:SetSizeY(statusY) 
 		   instance.SelectionFrame:SetSizeY(statusY)
@@ -322,7 +349,7 @@ function UpdateDisplay()
 	    local iMovesLeft = unit:MovesLeft() / iMovesDenominator
 	    local iMaxMoves = unit:MaxMoves() / iMovesDenominator
         
-		sortEntry.movement = iMovesLeft
+		sortEntry.Movement = iMovesLeft
         
         if iMovesLeft == iMaxMoves then
             instance.MovementPip:SetTextureOffsetVal(0, 0)
@@ -336,48 +363,75 @@ function UpdateDisplay()
 		local iUpgradeCost = 0
 		
 		if unit:CanUpgradeRightNow() then
-			iUpgradeCost = unit:UpgradePrice(unit:GetUpgradeUnitType())
-	        instance.Upgrade:SetToolTipString(Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_UPGRADE_TT", GameInfo.Units[unit:GetUpgradeUnitType()].Description, iUpgradeCost))
-			instance.Upgrade:SetText("[ICON_GOLD]")
+			iUpgradeUnit = unit:GetUpgradeUnitType()
+			
+			iUpgradeCost = unit:UpgradePrice(iUpgradeUnit)
+	        instance.Upgrade:SetText("[ICON_GOLD]")
+			
+			tUpgradeUnitData = GameInfo.Units[iUpgradeUnit]
+						
+			local sUpgradeTooltip = Locale.ConvertTextKey("TXT_KEY_LI_UNIT_STATUS_UPGRADE_TT", tUpgradeUnitData.Description, iUpgradeCost)
+			sUpgradeTooltip = sUpgradeTooltip .. "[NEWLINE][NEWLINE]" .. tUpgradeUnitData.Combat .. "[ICON_STRENGTH]"
+			
+			if tUpgradeUnitData.RangedCombat > 0 then
+				sUpgradeTooltip = sUpgradeTooltip .. "[NEWLINE]" .. tUpgradeUnitData.RangedCombat .. "/" .. tUpgradeUnitData.Range .. "[ICON_RANGE_STRENGTH]"
+			end
+			
+			sUpgradeTooltip = sUpgradeTooltip .. "[NEWLINE]" .. Locale.ConvertTextKey(tUpgradeUnitData.Help)
+			
+			instance.Upgrade:SetToolTipString(sUpgradeTooltip)
 			instance.UpgradeButton:RegisterCallback(Mouse.eLClick, OnUnitUpgrade)
 			instance.UpgradeButton:SetVoid1(unit:GetID())
 		end
 		
-        sortEntry.upgrade = iUpgradeCost
+        sortEntry.Upgrade = iUpgradeCost
         instance.Upgrade:SetHide(iUpgradeCost == 0)
 
 		-- hp
-        if unit:IsCombatUnit() or (unit:GetDomainType() == DomainTypes.DOMAIN_AIR and GameInfo.Units[unit:GetUnitType()].Suicide == false) then
-			local damage = unit:GetDamage()
+        if bIsMilitary and GameInfo.Units[unit:GetUnitType()].Suicide == false then
+			local iDamage = unit:GetDamage()
 			local iMaxDamage = unit:GetMaxHitPoints()
-			local iHealth = iMaxDamage - damage
+			local iHealth = iMaxDamage - iDamage
 			local iHealthTimes100 =  math.floor(100 * (iHealth/iMaxDamage) + 0.5)
-		
-			if iHealthTimes100 > 90 then
-			  sTextColour = "[COLOR:115:215:110:255]"
-			elseif iHealthTimes100 > 75 then
-			  sTextColour = "[COLOR:175:175:0:255]"
-			elseif iHealthTimes100 > 50 then
-			  sTextColour = "[COLOR_YELLOW]"
-			elseif iHealthTimes100 > 25 then
-			  sTextColour = "[COLOR_YIELD_FOOD]"
+			local iHealthPercent = 1 - (iDamage / iMaxDamage)
+       		
+			sortEntry.Damage = iHealth
+			
+			local sTextColour = "[COLOR:115:215:110:255]"
+			
+			if iHealthPercent < 1 then
+				if iHealthTimes100 > 90 then
+					instance.HealthBar:SetFGColor({x = 0.45, y = 0.84, z = 0.43, w = 1})
+				elseif iHealthTimes100 > 75 then
+					instance.HealthBar:SetFGColor({x = 0.69, y = 0.80, z = 0, w = 1})
+					sTextColour = "[COLOR:175:200:0:255]"
+				elseif iHealthTimes100 > 50 then
+					instance.HealthBar:SetFGColor({x = 1, y = 1, z = 0, w = 1})
+					sTextColour = "[COLOR_YELLOW]"
+				elseif iHealthTimes100 > 25 then
+					instance.HealthBar:SetFGColor({x = 1, y = 0.55, z = 0.15, w = 1})
+					sTextColour = "[COLOR_YIELD_FOOD]"
+				else
+					instance.HealthBar:SetFGColor({x = 1, y = 0, z = 0, w = 1})
+					sTextColour = "[COLOR_NEGATIVE_TEXT]"
+				end
+    			
+				instance.HealthBarAnchor:SetHide(false)
+        		instance.HealthBar:SetPercent(iHealthPercent)
 			else
-			  sTextColour = "[COLOR_NEGATIVE_TEXT]"
+				instance.HealthBarAnchor:SetHide(true)
 			end
-
-			sortEntry.damage = iHealth
-			instance.Damage:SetHide(false)
-  			instance.Damage:SetText(string.format("%s%i[ENDCOLOR]", sTextColour, iHealth))
-
-			instance.Damage:SetToolTipString(Locale.ConvertTextKey("TXT_KEY_UPANEL_SET_HITPOINTS_TT",(iMaxDamage-damage), iMaxDamage))
-    	else
-            sortEntry.damage = 0
-            instance.Damage:SetHide(true)
-  			instance.Damage:SetText("")
-        end
+			
+			local sUnitNameTooltip = sStatistics .. "[NEWLINE][NEWLINE]" .. sTextColour .. iHealth .. "/" .. iMaxDamage .. " (" .. tostring(math.floor(iHealthPercent * 100)) .. "%)[ENDCOLOR][NEWLINE][NEWLINE]" .. Locale.ConvertTextKey(GameInfo.Units[unit:GetUnitType()].Help)
+				
+			instance.HealthBar:SetToolTipString(sUnitNameTooltip)
+			instance.UnitName:SetToolTipString(sUnitNameTooltip)
+		else
+        	sortEntry.Damage = 0
+    	end
         
-        -- xp
-        if unit:IsCombatUnit() or (unit:GetDomainType() == DomainTypes.DOMAIN_AIR and GameInfo.Units[unit:GetUnitType()].Suicide == false) then
+		-- xp
+        if bIsMilitary and GameInfo.Units[unit:GetUnitType()].Suicide == false then
             local iExperience = unit:GetExperience()
             local iNeededExperience = unit:ExperienceNeeded()
 			local iLevel = unit:GetLevel()
@@ -392,44 +446,40 @@ function UpdateDisplay()
 				sColourEnd = "[ENDCOLOR]"
 			end
 			
-			local sExperienceAndLevel = sColour .. tostring(iExperience) .. ":" .. tostring(iLevel) .. sColourEnd
+			local sExperienceAndLevel = sColour .. iExperience .. ":" .. iLevel .. sColourEnd
 			
-			sortEntry.iExperience = iExperience
+			sortEntry.Experience = iExperience
             instance.Experience:SetHide(false)
   			instance.Experience:SetText(sExperienceAndLevel)
-
-			-- MOD - if we have support for XP times 100, show that in the tooltip instead
-			if unit.GetExperienceTimes100 then
-				iExperience = iExperience * 100
-				iNeededExperience = iNeededExperience * 100
-			end			
 			
-			-- promotion list
-			local sPromotions = ""
-			
-			for promotion in GameInfo.UnitPromotions() do
-				if unit:IsHasPromotion(promotion.ID) then
-					if sPromotions == "" then
-						sPromotions = Locale.ConvertTextKey(promotion.Description)
-					else
-						sPromotions = sPromotions .. "[NEWLINE]" .. Locale.ConvertTextKey(promotion.Description)
+			if m_tExperience[iUnit] ~= sExperienceAndLevel or bCheckedAndDeadPermanent then
+				local sPromotions = ""
+				
+				for promotion in GameInfo.UnitPromotions() do
+					if unit:IsHasPromotion(promotion.ID) then
+						if sPromotions == "" then
+							sPromotions = Locale.ConvertTextKey(promotion.Description)
+						else
+							sPromotions = sPromotions .. "[NEWLINE]" .. Locale.ConvertTextKey(promotion.Description)
+						end
 					end
 				end
+				
+				instance.Experience:SetToolTipString(sPromotions)
 			end
 			
-			instance.Experience:SetToolTipString(sPromotions)
+			m_tExperience[iUnit] = sExperienceAndLevel
     	else
-			sortEntry.iExperience = 0
+			sortEntry.Experience = 0
 			instance.Experience:SetHide(false)
   			instance.Experience:SetText("")
 		end
-        
+		
 		instance.UnitStack:CalculateSize()
 		instance.UnitStack:ReprocessAnchoring()
         
-        sortEntry.unit = unit
+        sortEntry.Unit = unit
     end
-
 
     if bFoundMilitary and bFoundCivilian then
         Controls.CivilianSeperator:SetHide(false)
@@ -485,8 +535,11 @@ end
 -- sorting function
 function SortFunction(a, b)
     local valueA, valueB
-    local entryA = m_SortTable[tostring(a)]
-    local entryB = m_SortTable[tostring(b)]
+    
+	local entryA = m_tSortTable[tostring(a)]
+    local entryB = m_tSortTable[tostring(b)]
+	
+	local bReversedOrder = false
 	
     if entryA == nil or entryB == nil then 
 		if entryA and entryB == nil then
@@ -501,61 +554,87 @@ function SortFunction(a, b)
 			end
         end
     else
-		if m_SortMode == eName then
-			valueA = entryA.name
-			valueB = entryB.name
-		elseif m_SortMode == eStatus then
-			valueA = entryA.status
-			valueB = entryB.status
-		elseif m_SortMode == eDamage then
-			valueA = entryB.damage
-			valueB = entryA.damage
-		elseif m_SortMode == eExperience then
-			valueA = entryB.iExperience
-			valueB = entryA.iExperience
-		elseif m_SortMode == eUpgrade then
-			valueA = entryB.upgrade
-			valueB = entryA.upgrade
-		else -- movement
-			valueA = entryA.movement
-			valueB = entryB.movement
+		if m_iSortMode == eName then
+			valueA = entryA.Name
+			valueB = entryB.Name
+		elseif m_iSortMode == eDamage then
+			valueA = entryB.Damage
+			valueB = entryA.Damage
+			bReversedOrder = true
+		elseif m_iSortMode == eStatus then
+			valueA = entryA.Status
+			valueB = entryB.Status
+		elseif m_iSortMode == eExperience then
+			valueA = entryB.Experience
+			valueB = entryA.Experience
+		elseif m_iSortMode == eUpgrade then
+			valueA = entryB.Upgrade
+			valueB = entryA.Upgrade
+		elseif m_iSortMode == eMovement then
+			valueA = entryA.Movement
+			valueB = entryB.Movement
+			bReversedOrder = true
 		end
 	    
 		if valueA == valueB then
-			valueA = entryA.unit:GetID()
-			valueB = entryB.unit:GetID()
+			valueA = entryA.Unit:GetID()
+			valueB = entryB.Unit:GetID()
 		end
 	    
 	   
-		if m_bSortReverse then
-			return valueA > valueB
+		if bReversedOrder then
+			if m_bSortReverse then
+				return valueA < valueB
+			else
+				return valueA > valueB
+			end
 		else
-			return valueA < valueB
+			if m_bSortReverse then
+				return valueA > valueB
+			else
+				return valueA < valueB
+			end
 		end
     end
 end
 
 function OnSort(type)
-    if m_SortMode == type then
+    if m_iSortMode == type then
         m_bSortReverse = not m_bSortReverse
     else
         m_bSortReverse = false
     end
 
-    m_SortMode = type
+    m_iSortMode = type
+    
+	Controls.MilitaryStack:SortChildren(SortFunction)
+    Controls.CivilianStack:SortChildren(SortFunction)
+end
+
+function OnSortAlternative(type)
+    if type == eName then
+		type = eDamage
+	end
+	
+	if m_iSortMode == type then
+        m_bSortReverse = not m_bSortReverse
+    else
+        m_bSortReverse = false
+    end
+
+    m_iSortMode = type
     
 	Controls.MilitaryStack:SortChildren(SortFunction)
     Controls.CivilianStack:SortChildren(SortFunction)
 end
 Controls.SortName:RegisterCallback(Mouse.eLClick, OnSort)
+Controls.SortName:RegisterCallback(Mouse.eRClick, OnSortAlternative)
 Controls.SortStatus:RegisterCallback(Mouse.eLClick, OnSort)
-Controls.SortDamage:RegisterCallback(Mouse.eLClick, OnSort)
 Controls.SortExperience:RegisterCallback(Mouse.eLClick, OnSort)
 Controls.SortUpgrade:RegisterCallback(Mouse.eLClick, OnSort)
 Controls.SortMovement:RegisterCallback(Mouse.eLClick, OnSort)
 Controls.SortName:SetVoid1(eName)
 Controls.SortStatus:SetVoid1(eStatus)
-Controls.SortDamage:SetVoid1(eDamage)
 Controls.SortExperience:SetVoid1(eExperience)
 Controls.SortUpgrade:SetVoid1(eUpgrade)
 Controls.SortMovement:SetVoid1(eMovement)

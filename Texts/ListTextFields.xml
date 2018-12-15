@@ -1,28 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <GameData>
 	<Language_en_US>
-		<Row Tag="TXT_KEY_LI_NUMBER_AND_NAME" >
-			<Text>#    Name</Text>
-		</Row>
 		<Row Tag="TXT_KEY_LI_NAME" >
 			<Text>Name</Text>
-		</Row>
-		<Row Tag="TXT_KEY_LI_XP" >
-			<Text>XP:Lvl</Text>
-		</Row>
-		<Row Tag="TXT_KEY_LI_HP" >
-			<Text>HP</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_STATUS" >
 			<Text>Status</Text>
 		</Row>
+		<Row Tag="TXT_KEY_LI_XP" >
+			<Text>XP:Lvl</Text>
+		</Row>
 
-		<Row Tag="TXT_KEY_LI_UNIT_STATUS_UPGRADE_TT" >
-			<Text>Upgrade to {1_Unit} for [ICON_GOLD]{2_Cost}</Text>
+		<Row Tag="TXT_KEY_LI_NUMBER_AND_NAME" >
+			<Text>#    Name</Text>
 		</Row>
 
 		<Row Tag="TXT_KEY_LI_SORT_NAME" >
-			<Text>Sort by name</Text>
+			<Text>LMB: Sort by name[NEWLINE]RMB: Sort by current health points</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_SORT_STATUS" >
 			<Text>Sort by current status</Text>
@@ -30,38 +24,39 @@
 		<Row Tag="TXT_KEY_LI_SORT_XP" >
 			<Text>Sort by experience amassed</Text>
 		</Row>
-		<Row Tag="TXT_KEY_LI_SORT_HP" >
-			<Text>Sort by current health points</Text>
-		</Row>
 		<Row Tag="TXT_KEY_LI_SORT_UPGRADE" >
-			<Text>Sort by upgrade possibility</Text>
+			<Text>Sort by possible upgrades</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_SORT_MOVES" >
-			<Text>Sort by moves left</Text>
+			<Text>Sort by movement points left</Text>
 		</Row>
 		
-		<Row Tag="TXT_KEY_LI_SORT_CITY_NAME" >
-			<Text>Sort by name (right click to center on city)</Text>
+		<Row Tag="TXT_KEY_LI_SORT_POPULATION" >
+			<Text>Sort by:[NEWLINE]LMB: current population[NEWLINE]RMB: turns left to next population growth</Text>
 		</Row>
-		<Row Tag="TXT_KEY_LI_SORT_PRODUCTION" >
-			<Text>Sort by turns left to finish current production</Text>
+		<Row Tag="TXT_KEY_LI_SORT_BORDER_GROWTH" >
+			<Text>Sort by turns left to next border growth</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LI_SORT_DEFENSE" >
+			<Text>Sort by defense value</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LI_SORT_CITY_NAME" >
+			<Text>Sort by:[NEWLINE]LMB: name[NEWLINE]RMB: current health points</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_SORT_HAPPINESS" >
 			<Text>Sort by unhappiness value</Text>
 		</Row>
-		<Row Tag="TXT_KEY_LI_SORT_POPULATION" >
-			<Text>Sort by current population</Text>
+		<Row Tag="TXT_KEY_LI_SORT_PRODUCTION" >
+			<Text>Sort by:[NEWLINE]LMB: turns left to finish current production[NEWLINE]RMB: process name</Text>
 		</Row>
-		<Row Tag="TXT_KEY_LI_SORT_BORDER_GROWTH" >
-			<Text>Sort by next border growth time</Text>
-		</Row>
-		<Row Tag="TXT_KEY_LI_SORT_DEFENSE" >
-			<Text>Sort by defense value (possible range attack)</Text>
+		<Row Tag="TXT_KEY_LI_SORT_RESOURCE_DEMAND" >
+			<Text>Sort by demanded resource name</Text>
 		</Row>
 		
 		<Row Tag="TXT_KEY_LI_SORT_RESOURCE" >
 			<Text>Sort by total number of luxury resources</Text>
 		</Row>
+		
 		<Row Tag="TXT_KEY_LI_SORT_PROGRESS" >
 			<Text>Sort by turns left to create new Great Person</Text>
 		</Row>
@@ -70,18 +65,15 @@
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_SLEEPING" >
 			<Text>Sleeping</Text>
 		</Row>
-
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_EMBARKED" >
 			<Text>Embarked</Text>
 		</Row>
-
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_WORKER_AUTOMATED" >
 			<Text>Automated</Text>
 		</Row>
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_WORKER_IDLE" >
 			<Text></Text>
 		</Row>
-
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_TRADING">
 			<Text>Trading ({1_TurnLeft})</Text>
 		</Row>
@@ -94,11 +86,9 @@
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_RECALLED_TT">
 			<Text>[COLOR_WARNING_TEXT] (Recalled)[ENDCOLOR]</Text>
 		</Row>
-
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_EXPLORING" >
 			<Text>Exploring</Text>
 		</Row>
-		
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_ALERT" >
 			<Text>Alerting</Text>
 		</Row>
@@ -117,9 +107,19 @@
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_HEALING" >
 			<Text>Healing</Text>
 		</Row>
+		<Row Tag="TXT_KEY_LI_UNIT_STATUS_UPGRADE_TT" >
+			<Text>Upgrade to {1_Unit} for {2_Cost}[ICON_GOLD]</Text>
+		</Row>
 
 		<Row Tag="TXT_KEY_LI_UNIT_STATUS_BUILD_SKIP_WORDS" >
 			<Text>Construct Chop Down Remove Clear Scrub a an</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_LI_CITY_RANGE_ATTACK_TOOLTIP" >
+			<Text>City can perform range attack on an enemy[NEWLINE][NEWLINE]LMB: Center on attacked city</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LI_CITY_NAME_TOOLTIP" >
+			<Text>[NEWLINE][NEWLINE]LMB: Enter the city[NEWLINE]RMB: Center on the city</Text>
 		</Row>
 	</Language_en_US>
 </GameData>

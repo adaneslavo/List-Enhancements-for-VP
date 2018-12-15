@@ -45,7 +45,7 @@
       </Association>
     </ModDependencies>
     <ModActions>
-      <Action xmlns="">
+      <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
         <FileName>Texts/ListTextFields.xml</FileName>

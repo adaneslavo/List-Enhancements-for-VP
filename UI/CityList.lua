@@ -5,15 +5,19 @@ local sDefaultErrorTextureSheet = "CityBannerProductionImage.dds"
 local vNullOffset = Vector2(0, 0)
 local g_iPortraitSize = 45
 
-local m_SortTable
 local ePopulation = 0
-local eName = 1
-local eHappiness = 2
-local eProduction = 3
-local eDefense = 4
-local eBorderGrowth = 5
+local ePopulationGrowth = 1
+local eBorderGrowth = 2
+local eDefense = 3
+local eName = 4
+local eHealth = 5
+local eHappiness = 6
+local eProductionTime = 7
+local eProductionName = 8
+local eResourceDemand = 9
 
-local m_SortMode = ePopulation
+local m_tSortTable
+local m_iSortMode = ePopulation
 local m_bSortReverse = false
 
 local tPediaSearchStrings = {}
@@ -87,7 +91,7 @@ end
 
 -- main function
 function UpdateDisplay()
-	m_SortTable = {}
+	m_tSortTable = {}
 	tPediaSearchStrings = {}
 
     local pPlayer = Players[Game.GetActivePlayer()]
@@ -106,14 +110,13 @@ function UpdateDisplay()
 		instance.CityRangeStrikeAnim:SetVoids(city:GetX(), city:GetY())
 		
         local sortEntry = {}
-		m_SortTable[tostring(instance.Root)] = sortEntry
+		m_tSortTable[tostring(instance.Root)] = sortEntry
 		
 		-- update range strike button (if it is the active player's city)
-		sortEntry.RangeAttack = ShouldShowRangeStrikeButton(city)
-		
-		if  sortEntry.RangeAttack then
+		if ShouldShowRangeStrikeButton(city) then
 			instance.CityRangeStrikeIcon:SetHide(false)
 			instance.CityRangeStrikeAnim:SetHide(false)
+			instance.CityRangeStrikeIcon:SetToolTipString(Locale.ConvertTextKey("TXT_KEY_LI_CITY_RANGE_ATTACK_TOOLTIP"))
 		else
 			instance.CityRangeStrikeIcon:SetHide(true)
 			instance.CityRangeStrikeAnim:SetHide(true)
@@ -123,10 +126,6 @@ function UpdateDisplay()
 		sortEntry.Defense = math.floor(city:GetStrengthValue() / 100)
         instance.Defense:SetText(sortEntry.Defense)
         
-		-- sort production
-        sortEntry.Production = city:GetProductionNameKey()
-        ProductionDetails(city, instance)
-		
 		-- sort city name
 		local sCityNameLong = city:GetName()
 		
@@ -145,6 +144,9 @@ function UpdateDisplay()
 		
 		sortEntry.CityName = sCityNameShort
         instance.CityName:SetText(sortEntry.CityName)
+		
+		-- production	
+        ProductionDetails(city, instance, sortEntry)
 		
 		-- unhappiness value
 		local iStarvingUnhappiness = city:GetUnhappinessFromStarving()
@@ -180,10 +182,10 @@ function UpdateDisplay()
 		local iCultureYield = city:GetUnhappinessFromCultureYield() / 100
 		local iDefenseYield = city:GetUnhappinessFromDefenseYield() / 100
 		local iGoldYield = city:GetUnhappinessFromGoldYield() / 100
+		local iScienceYield = city:GetUnhappinessFromScienceYield() / 100
 		local iCultureNeeded = city:GetUnhappinessFromCultureNeeded() / 100
 		local iDefenseNeeded = city:GetUnhappinessFromDefenseNeeded() / 100
 		local iGoldNeeded = city:GetUnhappinessFromGoldNeeded() / 100
-		local iScienceYield = city:GetUnhappinessFromScienceYield() / 100
 		local iScienceNeeded = city:GetUnhappinessFromScienceNeeded() / 100
 
 		local iCultureDeficit = city:GetUnhappinessFromCultureDeficit() / 100
@@ -199,32 +201,26 @@ function UpdateDisplay()
 			end
 		end
 
-		-- Puppet tooltip
 		if iPuppetUnhappiness ~= 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_PUPPET_UNHAPPINESS", iPuppetUnhappiness)
 		end
 
-		-- Occupation tooltip
 		if iOccupationUnhappiness ~= 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_OCCUPATION_UNHAPPINESS", iOccupationUnhappiness)
 		end
 
-		-- Resistance tooltip
 		if iResistanceUnhappiness ~= 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_RESISTANCE_UNHAPPINESS", iResistanceUnhappiness)
 		end
 		
-		-- Starving tooltip
 		if iStarvingUnhappiness ~= 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_STARVING_UNHAPPINESS", iStarvingUnhappiness)
 		end
 		
-		-- Pillaged tooltip
 		if iPillagedUnhappiness ~= 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_PILLAGED_UNHAPPINESS", iPillagedUnhappiness)
 		end
 				
-		-- Defense tooltip
 		if iDefenseUnhappiness > 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_DEFENSE_UNHAPPINESS", iDefenseUnhappiness, iDefenseYield, iDefenseNeeded, iDefenseDeficit)
 		end
@@ -233,7 +229,6 @@ function UpdateDisplay()
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_DEFENSE_UNHAPPINESS_SURPLUS", (iDefenseYield - iDefenseNeeded))
 		end
 		
-		-- Gold tooltip
 		if iGoldUnhappiness > 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_GOLD_UNHAPPINESS", iGoldUnhappiness, iGoldYield, iGoldNeeded, iGoldDeficit)
 		end
@@ -242,17 +237,14 @@ function UpdateDisplay()
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_GOLD_UNHAPPINESS_SURPLUS", (iGoldYield - iGoldNeeded))
 		end
 		
-		-- Connection tooltip
 		if iConnectionUnhappiness ~= 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_CONNECTION_UNHAPPINESS", iConnectionUnhappiness)
 		end
 		
-		-- Minority tooltip
 		if iMinorityUnhappiness ~= 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_MINORITY_UNHAPPINESS", iMinorityUnhappiness)
 		end
 		
-		-- Science tooltip
 		if iScienceUnhappiness > 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_SCIENCE_UNHAPPINESS", iScienceUnhappiness, iScienceYield, iScienceNeeded, iScienceDeficit)
 		end
@@ -261,7 +253,6 @@ function UpdateDisplay()
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_SCIENCE_UNHAPPINESS_SURPLUS", (iScienceYield - iScienceNeeded))
 		end
 		
-		-- Culture tooltip
 		if iCultureUnhappiness > 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_CULTURE_UNHAPPINESS", iCultureUnhappiness, iCultureYield, iCultureNeeded, iCultureDeficit)
 		end
@@ -272,45 +263,92 @@ function UpdateDisplay()
 		
 		instance.Happiness:SetToolTipString(strOccupationTT)
         
-        -- Health Bar
+		-- city connection
+		if pPlayer:IsCapitalConnectedToCity(city) then
+			instance.CityConnectionIcon:SetHide(false)
+			instance.CityConnectionIcon:SetAlpha(0.6);
+		else
+			instance.CityConnectionIcon:SetHide(true)
+		end
+		
+        -- city health
         local iMaxCityHitPoints
-        
+        local iCityDamage = city:GetDamage()
+		
 		if city.GetMaxHitPoints ~= nil then
 			iMaxCityHitPoints = city:GetMaxHitPoints()
         else
 			iMaxCityHitPoints = GameDefines.MAX_CITY_HIT_POINTS
         end
         
-        local iHealthPercent = 1 - (city:GetDamage() / iMaxCityHitPoints)
-        
+        local iHealthPercent = 1 - (iCityDamage / iMaxCityHitPoints)
+       	sortEntry.Health = iHealthPercent
+		
+		local sHealthColour = "[COLOR:0:255:100:255]"
+		
 		if iHealthPercent < 1 then        	
             if iHealthPercent > 0.66 then
-                instance.HealthBar:SetFGColor({x = 0, y = 1, z = 0.4, w = 1})
+                instance.HealthBar:SetFGColor({x = 0, y = 1, z = 0.3, w = 1})
             elseif iHealthPercent > 0.33 then
                 instance.HealthBar:SetFGColor({x = 1, y = 1, z = 0, w = 1})
+				sHealthColour = "[COLOR:0:255:255:0]"
             else
                 instance.HealthBar:SetFGColor({x = 1, y = 0, z = 0, w = 1})
+				sHealthColour = "[COLOR:0:0:255:255]"
             end
            
         	instance.HealthBarAnchor:SetHide(false)
         	instance.HealthBar:SetPercent(iHealthPercent)
-    	else
+		else
         	instance.HealthBarAnchor:SetHide(true)
     	end
+			
+			-- city income
+			local iFoodIncome = city:FoodDifferenceTimes100(false) / 100
+			local iProductionIncome = city:GetCurrentProductionDifferenceTimes100(false, false) / 100
+			local iGoldIncome = city:GetYieldRateTimes100(YieldTypes.YIELD_GOLD) / 100
+			local iScienceIncome = city:GetYieldRateTimes100(YieldTypes.YIELD_SCIENCE) / 100
+			local iCultureIncome = city:GetYieldRateTimes100(YieldTypes.YIELD_CULTURE) / 100
+			local iFaithIncome = city:GetYieldRateTimes100(YieldTypes.YIELD_FAITH) / 100
 		
+		local sCityNameTooltip = iFoodIncome .. "[ICON_FOOD][NEWLINE]" .. iProductionIncome .. "[ICON_PRODUCTION][NEWLINE]" .. iGoldIncome .. "[ICON_GOLD][NEWLINE]" .. iScienceIncome .. "[ICON_RESEARCH][NEWLINE]" .. iCultureIncome .. "[ICON_CULTURE][NEWLINE]" .. iFaithIncome .. "[ICON_PEACE][NEWLINE][NEWLINE]"
+		sCityNameTooltip = sCityNameTooltip .. sHealthColour .. (iMaxCityHitPoints - iCityDamage) .. "/" .. iMaxCityHitPoints .. " (" .. math.floor(iHealthPercent * 100) .. "%)[ENDCOLOR]"
+		sCityNameTooltip = sCityNameTooltip .. Locale.ConvertTextKey("TXT_KEY_LI_CITY_NAME_TOOLTIP")
+		
+		instance.CityName:SetToolTipString(sCityNameTooltip)
+		
+		-- resource demand
+		local sResourceNeeded = city:GetResourceDemanded()
+		local condition = "ID = '" .. sResourceNeeded .. "'"
+		local sResourceNeededName = "zzz"
+		local sResourceNeededIcon = ""
+		
+		for resource in GameInfo.Resources(condition) do
+			if resource.ID ~= -1 then
+				sResourceNeededIcon = resource.IconString
+				sResourceNeededName = Locale.ConvertTextKey(resource.Description)
+			end
+		end
+		
+		instance.ResourceDemand:SetText(sResourceNeededIcon)
+		instance.ResourceDemand:SetToolTipString(sResourceNeededName)
+		sortEntry.ResourceDemand = sResourceNeededName
+        	
+		-- population
 		local iPopulation = city:GetPopulation()
 		
 		sortEntry.Population = iPopulation
         instance.Population:SetText(sortEntry.Population)
-
-		-- Update Growth Meter
+		
+		-- update growth meter
+		local iFoodStored100 = city:GetFoodTimes100()
+		local iFoodNeeded = city:GrowthThreshold()
+		local iFoodPerTurn100 = city:FoodDifferenceTimes100(false)
+		local iCurrentFoodPlusThisTurn = (iFoodStored100 + iFoodPerTurn100) / 100
+		local iFoodTurnsLeft = city:GetFoodTurnsLeft()
+		
 		if instance.GrowthBar then
-			local iCurrentFood = city:GetFood()
-			local iFoodNeeded = city:GrowthThreshold()
-			local iFoodPerTurn = city:FoodDifference()
-			local iCurrentFoodPlusThisTurn = iCurrentFood + iFoodPerTurn
-			
-			local fGrowthProgressPercent = iCurrentFood / iFoodNeeded
+			local fGrowthProgressPercent = (iFoodStored100 / 100) / iFoodNeeded
 			local fGrowthProgressPlusThisTurnPercent = iCurrentFoodPlusThisTurn / iFoodNeeded
 			
 			if fGrowthProgressPlusThisTurnPercent > 1 then
@@ -321,34 +359,58 @@ function UpdateDisplay()
 			instance.GrowthBarShadow:SetPercent(fGrowthProgressPlusThisTurnPercent)
 		end
 		
-		-- Update Growth Time
+		-- update growth time
 		if instance.CityGrowth then
-			local iCityGrowth = city:GetFoodTurnsLeft()
+			local iCityGrowth, sCityGrowth
 			
 			if city:IsFoodProduction() or city:FoodDifferenceTimes100() == 0 then
-				iCityGrowth = "-"
-				instance.CityGrowth:SetToolTipString(Locale.ConvertTextKey("TXT_KEY_CITY_STOPPED_GROWING_TT", sCityNameLong, iPopulation))
+				iCityGrowth = 10000
+				sCityGrowth = "-"
 			elseif city:FoodDifferenceTimes100() < 0 then
 				iCityGrowth = math.floor(city:GetFoodTimes100() / -city:FoodDifferenceTimes100()) + 1
-				
-				iCityGrowth = "[COLOR_WARNING_TEXT]" .. iCityGrowth .. "[ENDCOLOR]"
-				instance.CityGrowth:SetToolTipString(Locale.ConvertTextKey("TXT_KEY_CITY_STARVING_TT", sCityNameLong))
+				sCityGrowth = "[COLOR_WARNING_TEXT]" .. iCityGrowth .. "[ENDCOLOR]"
 			else
-				instance.CityGrowth:SetToolTipString(Locale.ConvertTextKey("TXT_KEY_CITY_WILL_GROW_TT", sCityNameLong, iPopulation, iPopulation+1, iCityGrowth))
+				iCityGrowth = city:GetFoodTurnsLeft()
+				sCityGrowth = iCityGrowth
 			end
 			
-			instance.CityGrowth:SetText(iCityGrowth)
+			instance.CityGrowth:SetText(sCityGrowth)
+			sortEntry.PopulationGrowth = iCityGrowth
 		end
 		
-		-- Update Border Growth Meter
-		local iCurrentCulture = city:GetJONSCultureStored()
+		-- food tooltip
+		local sFoodTooltip = iFoodPerTurn100 / 100 .. "[ICON_FOOD] Total[NEWLINE][NEWLINE]"
+		sFoodTooltip = sFoodTooltip .. "Progress towards [COLOR_POSITIVE_TEXT]" .. iPopulation + 1 .. "[ICON_CITIZEN][ENDCOLOR]"
+		sFoodTooltip = sFoodTooltip .. "  " .. iFoodStored100 / 100 .. "[ICON_FOOD]/ " .. iFoodNeeded .. "[ICON_FOOD]"
+		
+		if iFoodPerTurn100 > 0 then
+			sFoodTooltip = sFoodTooltip .. "[NEWLINE]"
+
+			local iFoodOverflow100 = iFoodPerTurn100 * iFoodTurnsLeft + iFoodStored100 - iFoodNeeded * 100
+			
+			if iFoodTurnsLeft > 1 then
+				sFoodTooltip = sFoodTooltip .. Locale.ConvertTextKey("TXT_KEY_STR_TURNS", iFoodTurnsLeft - 1)
+					.. string.format(" %+g[ICON_FOOD]  ", (iFoodOverflow100 - iFoodPerTurn100) / 100)
+			end
+			
+			sFoodTooltip = sFoodTooltip .. "[COLOR_POSITIVE_TEXT]" .. Locale.ToUpper(Locale.ConvertTextKey("TXT_KEY_STR_TURNS", iFoodTurnsLeft )) .. "[ENDCOLOR]"
+					.. string.format(" %+g[ICON_FOOD]", iFoodOverflow100 / 100)
+		end
+		
+		instance.GrowthBar:SetToolTipString(sFoodTooltip)
+		instance.CityGrowth:SetToolTipString(sFoodTooltip)
+		instance.Population:SetToolTipString(sFoodTooltip)
+		
+		-- update border growth meter
+		local iCultureStored = city:GetJONSCultureStored()
 		local iCultureNeeded = city:GetJONSCultureThreshold()
 		local iCulturePerTurn = city:GetJONSCulturePerTurn()
-			
+		local iBorderGrowth
+		
 		if instance.BorderGrowthBar then
-			local iCurrentCulturePlusThisTurn = iCurrentCulture + iCulturePerTurn
+			local iCurrentCulturePlusThisTurn = iCultureStored + iCulturePerTurn
 			
-			local fBorderGrowthProgressPercent = iCurrentCulture / iCultureNeeded
+			local fBorderGrowthProgressPercent = iCultureStored / iCultureNeeded
 			local fBorderGrowthProgressPlusThisTurnPercent = iCurrentCulturePlusThisTurn / iCultureNeeded
 			
 			if fBorderGrowthProgressPlusThisTurnPercent > 1 then
@@ -359,17 +421,44 @@ function UpdateDisplay()
 			instance.BorderGrowthBarShadow:SetPercent(fBorderGrowthProgressPlusThisTurnPercent)
 		end
 		
-		-- Update Border Growth Time
+		-- update border growth time
 		if instance.BorderGrowth then
 			if iCulturePerTurn > 0 then
-				iBorderGrowth = tostring(math.floor((iCultureNeeded - iCurrentCulture) / iCulturePerTurn) + 1)
+				iBorderGrowth = math.floor((iCultureNeeded - iCultureStored) / iCulturePerTurn)
 			else
 				iBorderGrowth = "-"
 			end
 			
-			sortEntry.BorderGrowth = iBorderGrowth
-			instance.BorderGrowth:SetText(sortEntry.BorderGrowth)
+			instance.BorderGrowth:SetText(iBorderGrowth)
+			
+			if iBorderGrowth == "-" then
+				sortEntry.BorderGrowth = 10000
+			else
+				sortEntry.BorderGrowth = iBorderGrowth
+			end
 		end
+		
+		-- culture tooltip
+		local sCultureTooltip = iCulturePerTurn .. "[ICON_CULTURE] Total[NEWLINE][NEWLINE]"
+		sCultureTooltip = sCultureTooltip .. "Progress towards next [ICON_CULTURE_LOCAL] Border Growth[ENDCOLOR]"
+		sCultureTooltip = sCultureTooltip .. "  " .. iCultureStored .. "[ICON_CULTURE]/ " .. iCultureNeeded .. "[ICON_CULTURE]"
+		
+		if iCulturePerTurn > 0 then
+			sCultureTooltip = sCultureTooltip .. "[NEWLINE]"
+
+			local iCultureOverflow = iCulturePerTurn * iBorderGrowth + iCultureStored - iCultureNeeded
+			
+			if iBorderGrowth > 1 then
+				sCultureTooltip = sCultureTooltip .. Locale.ConvertTextKey("TXT_KEY_STR_TURNS", iBorderGrowth - 1)
+					.. string.format(" %+g[ICON_CULTURE]  ", iCultureOverflow - iCulturePerTurn)
+			end
+			
+			sCultureTooltip = sCultureTooltip .. "[COLOR_MAGENTA]" .. Locale.ToUpper(Locale.ConvertTextKey("TXT_KEY_STR_TURNS", iBorderGrowth)) .. "[ENDCOLOR]"
+					.. string.format(" %+g[ICON_CULTURE]", iCultureOverflow)
+		end
+		
+		instance.BorderGrowthBar:SetToolTipString(sCultureTooltip)
+		instance.BorderGrowth:SetToolTipString(sCultureTooltip)
     end
 
     Controls.MainStack:CalculateSize()
@@ -379,30 +468,7 @@ function UpdateDisplay()
 end
 
 -- production meter
-function ProductionDetails(city, instance)
-	-- update production bar
-	if instance.ProductionBar then
-		local iCurrentProduction = city:GetProduction()
-		local iProductionNeeded = city:GetProductionNeeded()
-		local iProductionPerTurn = city:GetYieldRate(YieldTypes.YIELD_PRODUCTION)
-		
-		if city:IsFoodProduction() then
-			iProductionPerTurn = iProductionPerTurn + city:GetYieldRate(YieldTypes.YIELD_FOOD) - city:FoodConsumption(true)
-		end
-		
-		local iCurrentProductionPlusThisTurn = iCurrentProduction + iProductionPerTurn
-		
-		local fProductionProgressPercent = iCurrentProduction / iProductionNeeded
-		local fProductionProgressPlusThisTurnPercent = iCurrentProductionPlusThisTurn / iProductionNeeded
-		
-		if fProductionProgressPlusThisTurnPercent > 1 then
-			fProductionProgressPlusThisTurnPercent = 1
-		end
-		
-		instance.ProductionBar:SetPercent(fProductionProgressPercent)
-		instance.ProductionBarShadow:SetPercent(fProductionProgressPlusThisTurnPercent)	
-	end	
-	
+function ProductionDetails(city, instance, sortEntry)
 	-- update production time
 	if instance.BuildGrowth then
 		local iBuildGrowth = "-"
@@ -414,24 +480,22 @@ function ProductionDetails(city, instance)
 		end
 		
 		instance.BuildGrowth:SetText(iBuildGrowth)
+		
+		-- sort production time
+        if iBuildGrowth == "-" then
+			sortEntry.ProductionTime = 10000
+		else
+			sortEntry.ProductionTime = iBuildGrowth
+		end
 	end
-
-	-- update production name
-	local sCityProductionName = city:GetProductionNameKey()
 	
-	if sCityProductionName == nil or string.len(sCityProductionName) == 0 then
-		sCityProductionName = "TXT_KEY_PRODUCTION_NO_PRODUCTION"
-	end
-	
-	instance.ProdImage:SetToolTipString(Locale.ConvertTextKey(sCityProductionName))
-
-
 	-- update production icon
+	local iUnitProduction = city:GetProductionUnit()
+	local iBuildingProduction = city:GetProductionBuilding()
+	local iProjectProduction = city:GetProductionProject()
+	local iProcessProduction = city:GetProductionProcess()
+		
 	if instance.ProdImage then
-		local iUnitProduction = city:GetProductionUnit()
-		local iBuildingProduction = city:GetProductionBuilding()
-		local iProjectProduction = city:GetProductionProject()
-		local iProcessProduction = city:GetProductionProcess()
 		local bNoProduction = false
 
 		if iUnitProduction ~= -1 then
@@ -471,6 +535,58 @@ function ProductionDetails(city, instance)
 		end
 	end
 	
+	-- sort production name
+	local sCityProductionName = city:GetProductionNameKey()
+	sortEntry.ProductionName = sCityProductionName
+
+	-- production tooltip
+	local iProductionPerTurn100 = city:GetCurrentProductionDifferenceTimes100(false, false)
+	local iProductionStored100 = city:GetProductionTimes100() + city:GetCurrentProductionDifferenceTimes100(false, true) - iProductionPerTurn100
+	local iProductionTurnsLeft = city:GetProductionTurnsLeft()
+	local iProductionNeeded = city:GetProductionNeeded()
+	
+	local sProductionTooltip = iProductionPerTurn100 / 100 .. "[ICON_PRODUCTION] Total[NEWLINE][NEWLINE]"
+	sProductionTooltip = sProductionTooltip .. "Progress towards [COLOR_YIELD_FOOD]" .. Locale.ToUpper(sCityProductionName) .. "[ENDCOLOR]"
+	sProductionTooltip = sProductionTooltip .. "  " .. iProductionStored100 / 100 .. "[ICON_PRODUCTION]/ " .. iProductionNeeded .. "[ICON_PRODUCTION]"
+	
+	if iProductionPerTurn100 > 0 then
+		sProductionTooltip = sProductionTooltip .. "[NEWLINE]"
+
+		local iProductionOverflow100 = iProductionPerTurn100 * iProductionTurnsLeft + iProductionStored100 - iProductionNeeded * 100
+		
+		if iProductionTurnsLeft > 1 then
+			sProductionTooltip = sProductionTooltip .. Locale.ConvertTextKey("TXT_KEY_STR_TURNS", iProductionTurnsLeft - 1)
+				.. string.format(" %+g[ICON_PRODUCTION]  ", (iProductionOverflow100 - iProductionPerTurn100) / 100)
+		end
+		
+		sProductionTooltip = sProductionTooltip .. "[COLOR_YIELD_FOOD]" .. Locale.ToUpper(Locale.ConvertTextKey("TXT_KEY_STR_TURNS", iProductionTurnsLeft )) .. "[ENDCOLOR]"
+				.. string.format(" %+g[ICON_PRODUCTION]", iProductionOverflow100 / 100)
+	end
+	
+	instance.ProdImage:SetToolTipString(Locale.ConvertTextKey(sProductionTooltip))
+	instance.ProductionBar:SetToolTipString(Locale.ConvertTextKey(sProductionTooltip))
+	
+	-- update production bar
+	if instance.ProductionBar then
+		local iProductionPerTurn = iProductionPerTurn100 / 100
+		
+		if city:IsFoodProduction() then
+			iProductionPerTurn = iProductionPerTurn + city:GetYieldRate(YieldTypes.YIELD_FOOD) - city:FoodConsumption(true)
+		end
+		
+		local iCurrentProductionPlusThisTurn = iProductionStored100 / 100 + iProductionPerTurn
+		
+		local fProductionProgressPercent = (iProductionStored100 / 100) / iProductionNeeded
+		local fProductionProgressPlusThisTurnPercent = iCurrentProductionPlusThisTurn / iProductionNeeded
+		
+		if fProductionProgressPlusThisTurnPercent > 1 then
+			fProductionProgressPlusThisTurnPercent = 1
+		end
+		
+		instance.ProductionBar:SetPercent(fProductionProgressPercent)
+		instance.ProductionBarShadow:SetPercent(fProductionProgressPlusThisTurnPercent)	
+	end	
+	
 	-- hookup pedia and production popup to production button
 	if not city:IsPuppet() then
 		instance.ProdButton:RegisterCallback(Mouse.eLClick, OnProdClick)
@@ -488,9 +604,11 @@ end
 -- sorting function
 function SortFunction(a, b)
     local valueA, valueB
+	
+	local entryA = m_tSortTable[tostring(a)]
+    local entryB = m_tSortTable[tostring(b)]
 
-    local entryA = m_SortTable[tostring(a)]
-    local entryB = m_SortTable[tostring(b)]
+	local bReversedOrder = false
 
     if entryA == nil or entryB == nil then 
 		if entryA and entryB == nil then
@@ -505,24 +623,42 @@ function SortFunction(a, b)
 			end
         end
     else
-		if m_SortMode == ePopulation then
+		if m_iSortMode == ePopulation then
 			valueA = entryA.Population
 			valueB = entryB.Population
-		elseif m_SortMode == eName then
-			valueA = entryA.CityName
-			valueB = entryB.CityName
-		elseif m_SortMode == eHappiness then
-			valueA = entryA.Happiness
-			valueB = entryB.Happiness
-		elseif m_SortMode == eDefense then
-			valueA = entryA.Defense
-			valueB = entryB.Defense
-		elseif m_SortMode == eBorderGrowth then
+		elseif m_iSortMode == ePopulationGrowth then
+			valueA = entryA.PopulationGrowth
+			valueB = entryB.PopulationGrowth
+			bReversedOrder = true
+		elseif m_iSortMode == eBorderGrowth then
 			valueA = entryA.BorderGrowth
 			valueB = entryB.BorderGrowth
-		else -- SortProduction
-			valueA = entryA.Production
-			valueB = entryB.Production
+			bReversedOrder = true
+		elseif m_iSortMode == eDefense then
+			valueA = entryA.Defense
+			valueB = entryB.Defense
+		elseif m_iSortMode == eName then
+			valueA = entryA.CityName
+			valueB = entryB.CityName
+		elseif m_iSortMode == eHealth then
+			valueA = entryA.Health
+			valueB = entryB.Health
+			bReversedOrder = true
+		elseif m_iSortMode == eHappiness then
+			valueA = entryA.Happiness
+			valueB = entryB.Happiness
+		elseif m_iSortMode == eProductionTime then
+			valueA = entryA.ProductionTime
+			valueB = entryB.ProductionTime
+			bReversedOrder = true
+		elseif m_iSortMode == eProductionName then
+			valueA = entryA.ProductionName
+			valueB = entryB.ProductionName
+			bReversedOrder = true
+		elseif m_iSortMode == eResourceDemand then
+			valueA = entryA.ResourceDemand
+			valueB = entryB.ResourceDemand
+			bReversedOrder = true
 		end
 	    
 		if valueA == valueB then
@@ -530,37 +666,69 @@ function SortFunction(a, b)
 			valueB = entryB.CityName
 		end
 
-		if m_bSortReverse then
-			return valueA < valueB
+		if bReversedOrder then
+			if m_bSortReverse then
+				return valueA > valueB
+			else
+				return valueA < valueB
+			end
 		else
-			return valueA > valueB
+			if m_bSortReverse then
+				return valueA < valueB
+			else
+				return valueA > valueB
+			end
 		end
     end
 
 end
 
 function OnSort(type)
-    if m_SortMode == type then
+    if m_iSortMode == type then
         m_bSortReverse = not m_bSortReverse
     else
         m_bSortReverse = false
     end
 
-    m_SortMode = type
+    m_iSortMode = type
+    Controls.MainStack:SortChildren(SortFunction)
+end
+
+function OnSortAlternative(type)
+    if type == ePopulation then
+		type = ePopulationGrowth
+	elseif type == eName then
+		type = eHealth
+	elseif type == eProductionTime then
+		type = eProductionName
+	end
+	
+	if m_iSortMode == type then
+        m_bSortReverse = not m_bSortReverse
+    else
+        m_bSortReverse = false
+    end
+
+    m_iSortMode = type
     Controls.MainStack:SortChildren(SortFunction)
 end
 Controls.SortPopulation:RegisterCallback(Mouse.eLClick, OnSort)
+Controls.SortPopulation:RegisterCallback(Mouse.eRClick, OnSortAlternative)
+Controls.SortBorderGrowth:RegisterCallback(Mouse.eLClick, OnSort)
+Controls.SortDefense:RegisterCallback(Mouse.eLClick, OnSort)
 Controls.SortCityName:RegisterCallback(Mouse.eLClick, OnSort)
+Controls.SortCityName:RegisterCallback(Mouse.eRClick, OnSortAlternative)
 Controls.SortHappiness:RegisterCallback(Mouse.eLClick, OnSort)
 Controls.SortProduction:RegisterCallback(Mouse.eLClick, OnSort)
-Controls.SortDefense:RegisterCallback(Mouse.eLClick, OnSort)
-Controls.SortBorderGrowth:RegisterCallback(Mouse.eLClick, OnSort)
+Controls.SortProduction:RegisterCallback(Mouse.eRClick, OnSortAlternative)
+Controls.SortResourceDemand:RegisterCallback(Mouse.eLClick, OnSort)
 Controls.SortPopulation:SetVoid1(ePopulation)
+Controls.SortBorderGrowth:SetVoid1(eBorderGrowth)
+Controls.SortDefense:SetVoid1(eDefense)
 Controls.SortCityName:SetVoid1(eName)
 Controls.SortHappiness:SetVoid1(eHappiness)
-Controls.SortProduction:SetVoid1(eProduction)
-Controls.SortDefense:SetVoid1(eDefense)
-Controls.SortBorderGrowth:SetVoid1(eBorderGrowth)
+Controls.SortProduction:SetVoid1(eProductionTime)
+Controls.SortResourceDemand:SetVoid1(eResourceDemand)
 
 -------------
 -- actions --
