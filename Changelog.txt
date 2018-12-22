@@ -26,8 +26,9 @@ v5:
 	- added city connection icon under unhappiness value.
 	- added additional sorting method for population (population number/growth), production (production turns/name) and name (also by health),
 	- modified tooltips for population, culture and production,
-	- added resource demand,
-- alignement issues .ixed,
+	- added resource demand with WLTKD counter,
+- added grid colours,
+- alignement issues fixed,
 - lowered main font,
 - text revision,
 - code cleaning.

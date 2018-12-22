@@ -266,7 +266,7 @@ function UpdateDisplay()
 		-- city connection
 		if pPlayer:IsCapitalConnectedToCity(city) then
 			instance.CityConnectionIcon:SetHide(false)
-			instance.CityConnectionIcon:SetAlpha(0.6);
+			instance.CityConnectionIcon:SetAlpha(0.5);
 		else
 			instance.CityConnectionIcon:SetHide(true)
 		end
@@ -318,23 +318,35 @@ function UpdateDisplay()
 		instance.CityName:SetToolTipString(sCityNameTooltip)
 		
 		-- resource demand
-		local sResourceNeeded = city:GetResourceDemanded()
+		local sResourceNeeded = city:GetResourceDemanded(true)
 		local condition = "ID = '" .. sResourceNeeded .. "'"
 		local sResourceNeededName = "zzz"
 		local sResourceNeededIcon = ""
+		local iWLTKDCounter = city:GetWeLoveTheKingDayCounter()
 		
 		for resource in GameInfo.Resources(condition) do
-			if resource.ID ~= -1 then
+			if resource.ID ~= -1  and iWLTKDCounter == 0 then
 				sResourceNeededIcon = resource.IconString
 				sResourceNeededName = Locale.ConvertTextKey(resource.Description)
+			elseif resource.ID ~= -1  and iWLTKDCounter > 0 then
+				sResourceNeededIcon = iWLTKDCounter
+				sResourceNeededName = ""
 			end
 		end
 		
 		instance.ResourceDemand:SetText(sResourceNeededIcon)
 		instance.ResourceDemand:SetToolTipString(sResourceNeededName)
 		sortEntry.ResourceDemand = sResourceNeededName
-        	
-		-- population
+        
+		-- WLTKD
+		if iWLTKDCounter > 0 then
+			instance.WLTKDIcon:SetHide(false)
+			instance.WLTKDIcon:SetAlpha(0.5);
+		else
+			instance.WLTKDIcon:SetHide(true)
+		end
+		
+       -- population
 		local iPopulation = city:GetPopulation()
 		
 		sortEntry.Population = iPopulation

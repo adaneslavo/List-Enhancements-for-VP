@@ -8,8 +8,8 @@
 				<Grid Anchor="C,C" Offset="0,1" Size="460,29" Style="Grid9FrameTurns" ID="SelectionFrame" />
 
 				<!-- Name -->
-				<Box Anchor="L,C" Color="255.255.255.0" Offset="50,-2" Size="140,28">
-					<Label Anchor="L,C" ID="UnitName" Offset="0,0" String="" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" />
+				<Box Anchor="L,C" Color="Black,0" Offset="40,-2" Size="157,26">
+					<Label Anchor="L,C" ID="UnitName" Offset="10,0" String="" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" />
 				</Box>
 
 				<ShowOnMouseOver>
@@ -24,26 +24,26 @@
 				</Box>
 			</Button>
 
-			<Stack ID="UnitStack" Anchor="L,C" StackGrowth="Right" Offset="200,-1" Padding="0" >
+			<Stack ID="UnitStack" Anchor="L,C" StackGrowth="Right" Offset="197,-1" Padding="0" >
 				<!-- Status -->
-				<Box ID="StatusBox" Anchor="L,C" Color="255.255.255.0" Offset="0,0" Size="133,28">
+				<Box ID="StatusBox" Anchor="L,C" Color="White,15" Offset="0,0" Size="140,26">
 					<Label Anchor="C,C" LeadingOffset="0" Offset="0,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" Hidden="1" ID="Status" />
 				</Box>
 
 				<!-- XP -->
-				<Box ID="ExperienceBox" Anchor="L,C" Color="255.255.255.0" Offset="0,0" Size="60,28">
-					<Label Anchor="R,C" Offset="0,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" Hidden="1" ID="Experience" />
+				<Box ID="ExperienceBox" Anchor="L,C" Color="Black,0" Offset="0,0" Size="60,26">
+					<Label Anchor="R,C" Offset="3,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" Hidden="1" ID="Experience" />
 				</Box>
 
-				<!-- Upgrade? -->
-				<Box ID="UpgradeBox" Anchor="L,C" Color="255.255.255.0" Offset="4,0" Size="25,28">
+				<!-- Upgrade -->
+				<Box ID="UpgradeBox" Anchor="L,C" Color="White,15" Offset="0,0" Size="27,26">
 					<Button Size="25,28" Anchor="C,C" ID="UpgradeButton" >
 						<Label Anchor="C,C" Offset="0,0" ColorSet="Beige_Black_Alpha" Font="TwCenMT16" FontStyle="Shadow" Hidden="1" ID="Upgrade" String="[ICON_GOLD]"/>
 					</Button>
 				</Box>
 
 				<!-- Moves Left -->
-				<Box Offset="4,1" Anchor="L,C" Color="255.255.255.0" Offset="0,0" Size="22,28">
+				<Box Anchor="L,C" Color="Black,0" Offset="0,0" Size="27,26">
 					<Image Anchor="C,C" Offset="0,0" Texture="assets/UI/Art/Icons/MarcPips.dds" Size="32.32" ID="MovementPip" />
 				</Box>
 			</Stack>
@@ -53,72 +53,82 @@
 	<!--=======================================================================================================================-->
 	<!--=======================================================================================================================-->
 
-	<Grid Size="460,400" Anchor="L,T" Offset="-7,4" Style="Grid9DetailFive140" ConsumeMouse="1" >
-		<Box Offset="0,44" Anchor="L,T" Size="450,24" Color="255,255,255,0" >
+	<Grid Size="460,400" Anchor="L,T" Offset="-7,4" Style="Grid9DetailFive140" ConsumeMouse="1">
+		<Box Offset="0,44" Anchor="L,T" Size="450,24" Color="0,0,0,0">
 			<Stack Anchor="L,C" StackGrowth="Right" Offset="0,0" Padding="0" >
 				<!-- Name -->
-				<Button Offset="10,0" Anchor="R,C" Size="140,24" ID="SortName" ToolTip="TXT_KEY_LI_SORT_NAME">
-					<Label Anchor="C,C" Offset="0,0" String="TXT_KEY_LI_NAME" ColorSet="Beige_Black_Alpha" Font="TwCenMT20" FontStyle="Shadow" />
+				<Box Offset="10,0" Anchor="R,C" Size="180,24" Color="Black,0">
+					<Button Offset="0,0" Anchor="R,C" Size="180,24" ID="SortName" ToolTip="TXT_KEY_LI_SORT_NAME">
+						<Label Anchor="C,C" Offset="-25,0" String="TXT_KEY_LI_NAME" ColorSet="Beige_Black_Alpha" Font="TwCenMT20" FontStyle="Shadow" />
 
-					<ShowOnMouseOver>
-						<AlphaAnim Anchor="C,C" Size="100,32" Pause="0" Cycle="Bounce" Speed="1" AlphaStart="2" AlphaEnd="1">
-							<Grid Size="100,32" Offset="0,0" Padding="0,0" Style="Grid9FrameTurnsHL" />
-						</AlphaAnim>
-					</ShowOnMouseOver>
-				</Button>
+						<ShowOnMouseOver>
+							<AlphaAnim Anchor="C,C" Size="100,32" Pause="0" Cycle="Bounce" Speed="1" AlphaStart="2" AlphaEnd="1">
+								<Grid Size="100,32" Offset="0,0" Padding="0,0" Style="Grid9FrameTurnsHL" />
+							</AlphaAnim>
+						</ShowOnMouseOver>
+					</Button>
+				</Box>
 
 				<!-- Status -->
-				<Button Offset="50,0" Anchor="C,C" Size="120,24" ID="SortStatus" ToolTip="TXT_KEY_LI_SORT_STATUS" >
-					<Label Anchor="C,C" Offset="0,0" String="TXT_KEY_LI_STATUS" ColorSet="Beige_Black_Alpha" Font="TwCenMT20" FontStyle="Shadow" />
+				<Box Offset="0,0" Anchor="R,C" Size="140,24" Color="White,15">
+					<Button Offset="0,0" Anchor="C,C" Size="140,24" ID="SortStatus" ToolTip="TXT_KEY_LI_SORT_STATUS">
+						<Label Anchor="C,C" Offset="0,0" String="TXT_KEY_LI_STATUS" ColorSet="Beige_Black_Alpha" Font="TwCenMT20" FontStyle="Shadow" />
 
-					<ShowOnMouseOver>
-						<AlphaAnim Anchor="C,C" Size="110,32" Pause="0" Cycle="Bounce" Speed="1" AlphaStart="2" AlphaEnd="1">
-							<Grid Size="110,32" Offset="0,0" Padding="0,0" Style="Grid9FrameTurnsHL" />
-						</AlphaAnim>
-					</ShowOnMouseOver>
-				</Button>
+						<ShowOnMouseOver>
+							<AlphaAnim Anchor="C,C" Size="110,32" Pause="0" Cycle="Bounce" Speed="1" AlphaStart="2" AlphaEnd="1">
+								<Grid Size="110,32" Offset="0,0" Padding="0,0" Style="Grid9FrameTurnsHL" />
+							</AlphaAnim>
+						</ShowOnMouseOver>
+					</Button>
+				</Box>
 
 				<!-- XP -->
-				<Button Offset="17,0" Anchor="C,C" Size="50,24" ID="SortExperience" ToolTip="TXT_KEY_LI_SORT_XP" >
-					<Label Anchor="L,C" Offset="0,0" String="TXT_KEY_LI_XP" ColorSet="Beige_Black_Alpha" Font="TwCenMT20" FontStyle="Shadow" />
+				<Box Offset="0,0" Anchor="R,C" Size="60,24" Color="Black,0">
+					<Button Offset="0,0" Anchor="R,C" Size="60,24" ID="SortExperience" ToolTip="TXT_KEY_LI_SORT_XP">
+						<Label Anchor="C,C" Offset="0,0" String="TXT_KEY_LI_XP" ColorSet="Beige_Black_Alpha" Font="TwCenMT20" FontStyle="Shadow" />
 
-					<ShowOnMouseOver>
-						<AlphaAnim Anchor="C,C" Size="80,32" Pause="0" Cycle="Bounce" Speed="1" AlphaStart="2" AlphaEnd="1">
-							<Grid Size="80,32" Offset="0,0" Padding="0,0" Style="Grid9FrameTurnsHL" />
-						</AlphaAnim>
-					</ShowOnMouseOver>
-				</Button>
+						<ShowOnMouseOver>
+							<AlphaAnim Anchor="C,C" Size="80,32" Pause="0" Cycle="Bounce" Speed="1" AlphaStart="2" AlphaEnd="1">
+								<Grid Size="80,32" Offset="0,0" Padding="0,0" Style="Grid9FrameTurnsHL" />
+							</AlphaAnim>
+						</ShowOnMouseOver>
+					</Button>
+				</Box>
 
 				<!-- Upgrade -->
-				<Button Offset="-4,0" Anchor="C,C" Size="40,24" ID="SortUpgrade" ToolTip="TXT_KEY_LI_SORT_UPGRADE" >
-					<Label Anchor="C,C" Offset="0,0" String="[ICON_GOLD]" ColorSet="Beige_Black_Alpha" Font="TwCenMT20" FontStyle="Shadow" />
+				<Box Offset="0,0" Anchor="R,C" Size="27,24" Color="White,15">
+					<Button Offset="0,0" Anchor="C,C" Size="40,24" ID="SortUpgrade" ToolTip="TXT_KEY_LI_SORT_UPGRADE">
+						<Label Anchor="C,C" Offset="0,0" String="[ICON_GOLD]" ColorSet="Beige_Black_Alpha" Font="TwCenMT20" FontStyle="Shadow" />
 
-					<ShowOnMouseOver>
-						<AlphaAnim Anchor="C,C" Size="40,32" Pause="0" Cycle="Bounce" Speed="1" AlphaStart="2" AlphaEnd="1">
-							<Grid Size="40,32" Offset="0,0" Padding="0,0" Style="Grid9FrameTurnsHL" />
-						</AlphaAnim>
-					</ShowOnMouseOver>
-				</Button>
+						<ShowOnMouseOver>
+							<AlphaAnim Anchor="C,C" Size="40,32" Pause="0" Cycle="Bounce" Speed="1" AlphaStart="2" AlphaEnd="1">
+								<Grid Size="40,32" Offset="0,0" Padding="0,0" Style="Grid9FrameTurnsHL" />
+							</AlphaAnim>
+						</ShowOnMouseOver>
+					</Button>
+				</Box>
 
 				<!-- Moves Left -->
-				<Button Offset="-13,2" Anchor="L,C" Size="40,24" ID="SortMovement" ToolTip="TXT_KEY_LI_SORT_MOVES" >
-					<Image Anchor="C,C" Offset="0,0" Texture="assets/UI/Art/Icons/MarcPips.dds" TextureOffset="0.96" Size="32.32" />
+				<Box Offset="0,0" Anchor="R,C" Size="27,24" Color="Black,0">
+					<Button Offset="0,2" Anchor="C,C" Size="40,24" ID="SortMovement" ToolTip="TXT_KEY_LI_SORT_MOVES">
+						<Image Anchor="C,C" Offset="0,0" Texture="assets/UI/Art/Icons/MarcPips.dds" TextureOffset="0.96" Size="32.32" />
 
-					<ShowOnMouseOver>
-						<AlphaAnim Anchor="C,C" Size="40,32" Pause="0" Cycle="Bounce" Speed="1" AlphaStart="2" AlphaEnd="1">
-							<Grid Size="40,32" Offset="0,0" Padding="0,0" Style="Grid9FrameTurnsHL" />
-						</AlphaAnim>
-					</ShowOnMouseOver>
-				</Button>
+						<ShowOnMouseOver>
+							<AlphaAnim Anchor="C,C" Size="40,32" Pause="0" Cycle="Bounce" Speed="1" AlphaStart="2" AlphaEnd="1">
+								<Grid Size="40,32" Offset="0,0" Padding="0,0" Style="Grid9FrameTurnsHL" />
+							</AlphaAnim>
+						</ShowOnMouseOver>
+					</Button>
+				</Box>
 			</Stack>
 
-			<Image Anchor="C,B" Offset="0,-2" Texture="HorizontalTrim.dds" Size="436,3" />
+			<Image Anchor="C,B" Offset="0,-3" Texture="HorizontalTrim.dds" Size="436,3" />
 		</Box>
 
 		<ScrollPanel Anchor="L,T" Offset="-7,72" Size="450,255" Vertical="1" ID="ScrollPanel" >
 			<Stack Anchor="L,T" StackGrowth="B" Padding="0" ID="MainStack" >
 				<Stack Anchor="L,B" Offset="0,0" StackGrowth="Bottom" Padding="2" ID="MilitaryStack" />
-				<Image Anchor="C,B" Offset="10,5" Texture="bar340x2.dds" Size="340.1" ID="CivilianSeperator"/>
+				<Image Anchor="C,B" Offset="10,4" Texture="bar340x2.dds" Size="340.1" ID="CivilianSeperator"/>
 				<Stack Anchor="L,B" Offset="0,5" StackGrowth="Bottom" Padding="2" ID="CivilianStack" />
 			</Stack>
 
