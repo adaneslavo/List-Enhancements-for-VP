@@ -21,12 +21,13 @@ v5:
 	- added defense value and merged it with icon showing if city attack is possible; added tooltip,
 	- clicking on icon for city attack zooms to city,
 	- reworked city name and health bar; now longer names, health bar moved and aligned to the left,
+	- added marker if city has garrison,
 	- added tooltip to name: ==> shows yields,
 							 ==> current health/max health (percent health).
 	- added city connection icon under unhappiness value.
 	- added additional sorting method for population (population number/growth), production (production turns/name) and name (also by health),
 	- modified tooltips for population, culture and production,
-	- added resource demand with WLTKD counter,
+	- added resource demand with WLTKD counter.
 - added grid colours,
 - alignement issues fixed,
 - lowered main font,

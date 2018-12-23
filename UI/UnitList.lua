@@ -98,8 +98,6 @@ GameEvents.UnitPromoted.Add(OnChangeEvent)
 
 -- main function
 function UpdateDisplay()
-	print("nowy update")
-	print(" ")
 	m_tSortTable = {}
 	
 	local pPlayer = Players[Game.GetActivePlayer()]
@@ -121,13 +119,12 @@ function UpdateDisplay()
 	
 	for id, xp in pairs(m_tExperience) do
 		local bCheckedAndDead = true
-		print(id)
+		
 		for unit in pPlayer:Units() do
 			iUnit = unit:GetID()
 			
 			if iUnit == id then
 				bCheckedAndDead = false
-				print("found")
 				break
 			end
 		end
@@ -135,7 +132,6 @@ function UpdateDisplay()
 		if bCheckedAndDead == true then
 			m_tExperience[id] = nil
 			bCheckedAndDeadPermanent = true
-			print("usunieto")
 		end
 	end
 	

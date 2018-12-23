@@ -1,5 +1,6 @@
 include("IconSupport")
 include("InstanceManager")
+include("SupportFunctions")
 
 local sDefaultErrorTextureSheet = "CityBannerProductionImage.dds"
 local vNullOffset = Vector2(0, 0)
@@ -128,22 +129,38 @@ function UpdateDisplay()
         
 		-- sort city name
 		local sCityNameLong = city:GetName()
+		local sCityPrefix = ""
 		
-		sCityNameShort = string.sub(sCityNameLong, 1, 20)
+		local bIsGarrisoned = nil
+		bIsGarrisoned = city:GetGarrisonedUnit() ~= nil
+		local bIsCapital = city:IsCapital()
+		local bIsPuppet = city:IsPuppet()
+		local bIsOccupied = (city:IsOccupied() and not city:IsNoOccupiedUnhappiness())
 		
-		if city:IsCapital() then
-			sCityNameShort = string.sub(sCityNameLong, 1, 15)
-			sCityNameShort = "[ICON_CAPITAL] " .. sCityNameShort
-		elseif city:IsPuppet() then
-			sCityNameShort = string.sub(sCityNameLong, 1, 15)
-			sCityNameShort = "[ICON_PUPPET] " .. sCityNameShort
-		elseif city:IsOccupied() and not city:IsNoOccupiedUnhappiness() then
-			sCityNameShort = string.sub(sCityNameLong, 1, 15)
-			sCityNameShort = "[ICON_OCCUPIED] " .. sCityNameShort
+		if bIsGarrisoned then
+			if bIsCapital then
+				sCityPrefix = "[ICON_CAPITAL][ICON_RANGE_STRENGTH] "
+			elseif bIsPuppet then
+				sCityPrefix = "[ICON_PUPPET] [ICON_RANGE_STRENGTH] "
+			elseif bIsOccupied then
+				sCityPrefix = "[ICON_OCCUPIED] [ICON_RANGE_STRENGTH] "
+			else
+				sCityPrefix = "[ICON_RANGE_STRENGTH] "
+			end
+		else
+			if bIsCapital then
+				sCityPrefix = "[ICON_CAPITAL] "
+			elseif bIsPuppet then
+				sCityPrefix = "[ICON_PUPPET] "
+			elseif bIsOccupied then
+				sCityPrefix = "[ICON_OCCUPIED] "
+			end
 		end
 		
-		sortEntry.CityName = sCityNameShort
-        instance.CityName:SetText(sortEntry.CityName)
+		sortEntry.CityName = sCityNameLong
+        
+		sCityNameLong = sCityPrefix .. sCityNameLong
+		TruncateString(instance.CityName, 150, sCityNameLong)
 		
 		-- production	
         ProductionDetails(city, instance, sortEntry)
@@ -638,39 +655,36 @@ function SortFunction(a, b)
 		if m_iSortMode == ePopulation then
 			valueA = entryA.Population
 			valueB = entryB.Population
+			bReversedOrder = true
 		elseif m_iSortMode == ePopulationGrowth then
 			valueA = entryA.PopulationGrowth
 			valueB = entryB.PopulationGrowth
-			bReversedOrder = true
 		elseif m_iSortMode == eBorderGrowth then
 			valueA = entryA.BorderGrowth
 			valueB = entryB.BorderGrowth
-			bReversedOrder = true
 		elseif m_iSortMode == eDefense then
 			valueA = entryA.Defense
 			valueB = entryB.Defense
+			bReversedOrder = true
 		elseif m_iSortMode == eName then
 			valueA = entryA.CityName
 			valueB = entryB.CityName
 		elseif m_iSortMode == eHealth then
 			valueA = entryA.Health
 			valueB = entryB.Health
-			bReversedOrder = true
 		elseif m_iSortMode == eHappiness then
 			valueA = entryA.Happiness
 			valueB = entryB.Happiness
+			bReversedOrder = true
 		elseif m_iSortMode == eProductionTime then
 			valueA = entryA.ProductionTime
 			valueB = entryB.ProductionTime
-			bReversedOrder = true
 		elseif m_iSortMode == eProductionName then
 			valueA = entryA.ProductionName
 			valueB = entryB.ProductionName
-			bReversedOrder = true
 		elseif m_iSortMode == eResourceDemand then
 			valueA = entryA.ResourceDemand
 			valueB = entryB.ResourceDemand
-			bReversedOrder = true
 		end
 	    
 		if valueA == valueB then
@@ -680,15 +694,15 @@ function SortFunction(a, b)
 
 		if bReversedOrder then
 			if m_bSortReverse then
-				return valueA > valueB
-			else
 				return valueA < valueB
+			else
+				return valueA > valueB
 			end
 		else
 			if m_bSortReverse then
-				return valueA < valueB
-			else
 				return valueA > valueB
+			else
+				return valueA < valueB
 			end
 		end
     end
