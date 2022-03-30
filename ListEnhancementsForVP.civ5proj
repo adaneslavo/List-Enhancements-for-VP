@@ -5,7 +5,7 @@
     <ProjectGuid>{d372df03-fc31-40cc-bdd2-7c5bc2e3059d}</ProjectGuid>
     <Name>(ui) List Enhancements for VP</Name>
     <Guid>200c965c-b3c0-43e6-8656-a7df71189c81</Guid>
-    <ModVersion>5</ModVersion>
+    <ModVersion>6</ModVersion>
     <Stability>Stable</Stability>
     <Teaser>Ehancements for left EUI info panels</Teaser>
     <Description>Modifies EUI lists in left info panels.</Description>
@@ -26,20 +26,6 @@
         <Type>Mod</Type>
         <Name>(2) Community Balance Overhaul</Name>
         <Id>8411a7a8-dad3-4622-a18e-fcc18324c799</Id>
-        <MinVersion>0</MinVersion>
-        <MaxVersion>999</MaxVersion>
-      </Association>
-      <Association>
-        <Type>Mod</Type>
-        <Name>(3) City-State Diplomacy</Name>
-        <Id>eead0050-1e3f-4178-a91f-26cf1881ac39</Id>
-        <MinVersion>0</MinVersion>
-        <MaxVersion>999</MaxVersion>
-      </Association>
-      <Association>
-        <Type>Mod</Type>
-        <Name>(5) More Luxuries - CBO Edition</Name>
-        <Id>be2d13ee-d18d-410e-8f04-7cd19cd99a98</Id>
         <MinVersion>0</MinVersion>
         <MaxVersion>999</MaxVersion>
       </Association>

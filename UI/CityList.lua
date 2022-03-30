@@ -139,7 +139,7 @@ function UpdateDisplay()
 		
 		if bIsGarrisoned then
 			if bIsCapital then
-				sCityPrefix = "[ICON_CAPITAL][ICON_RANGE_STRENGTH] "
+				sCityPrefix = "[ICON_CAPITAL] [ICON_RANGE_STRENGTH] "
 			elseif bIsPuppet then
 				sCityPrefix = "[ICON_PUPPET] [ICON_RANGE_STRENGTH] "
 			elseif bIsOccupied then
