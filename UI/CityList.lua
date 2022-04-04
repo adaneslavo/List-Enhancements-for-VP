@@ -166,7 +166,7 @@ function UpdateDisplay()
         ProductionDetails(city, instance, sortEntry)
 		
 		-- unhappiness value
-		local iStarvingUnhappiness = city:GetUnhappinessFromStarving()
+		--[[local iStarvingUnhappiness = city:GetUnhappinessFromStarving()
 		local iPillagedUnhappiness = city:GetUnhappinessFromPillaged()
 		local iGoldUnhappiness = city:GetUnhappinessFromGold()
 		local iDefenseUnhappiness = city:GetUnhappinessFromDefense()
@@ -266,7 +266,7 @@ function UpdateDisplay()
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_SCIENCE_UNHAPPINESS", iScienceUnhappiness, iScienceYield, iScienceNeeded, iScienceDeficit)
 		end
 		
-		if  iScienceYield - iScienceNeeded >= 0 then
+		if iScienceYield - iScienceNeeded >= 0 then
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_SCIENCE_UNHAPPINESS_SURPLUS", (iScienceYield - iScienceNeeded))
 		end
 		
@@ -278,6 +278,16 @@ function UpdateDisplay()
 			strOccupationTT = strOccupationTT .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_CULTURE_UNHAPPINESS_SURPLUS", (iCultureYield - iCultureNeeded))
 		end
 		
+		instance.Happiness:SetToolTipString(strOccupationTT)--]]
+
+		local iTotalUnhappiness = city:getHappinessDelta();
+		
+		sortEntry.Happiness = math.floor(iTotalUnhappiness)
+        instance.Happiness:SetText(sortEntry.Happiness)
+
+		-- unhappiness tooltip
+        local strOccupationTT = city:GetCityHappinessBreakdown() .. "[NEWLINE][NEWLINE]" .. city:GetCityUnhappinessBreakdown(false);
+
 		instance.Happiness:SetToolTipString(strOccupationTT)
         
 		-- city connection

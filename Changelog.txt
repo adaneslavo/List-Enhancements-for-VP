@@ -1,6 +1,9 @@
 Changelog:
-v5.1:
-- 
+v6.1:
+- fixed the happiness tooltip issue (related to @civplayer33 fix I didn't put into my code);
+
+v6:
+- compatibility with VP 2.0;
 
 v5:
 - unit list:
