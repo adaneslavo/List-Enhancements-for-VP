@@ -5,7 +5,7 @@
     <ProjectGuid>{d372df03-fc31-40cc-bdd2-7c5bc2e3059d}</ProjectGuid>
     <Name>(ui) List Enhancements for VP</Name>
     <Guid>200c965c-b3c0-43e6-8656-a7df71189c81</Guid>
-    <ModVersion>6</ModVersion>
+    <ModVersion>7</ModVersion>
     <Stability>Stable</Stability>
     <Teaser>Ehancements for left EUI info panels</Teaser>
     <Description>Modifies EUI lists in left info panels.</Description>
@@ -67,6 +67,10 @@
       <ImportIntoVFS>True</ImportIntoVFS>
     </Content>
     <Content Include="UI\GPList.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="UI\ResourceList.lua">
       <SubType>Lua</SubType>
       <ImportIntoVFS>True</ImportIntoVFS>
     </Content>

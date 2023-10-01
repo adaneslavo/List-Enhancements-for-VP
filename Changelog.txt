@@ -1,4 +1,7 @@
 Changelog:
+v7:
+- added new file for Resource list, so I can edit them now and improve a bit;
+
 v6.1:
 - fixed the happiness tooltip issue (related to @civplayer33 fix I didn't put into my code);
 
